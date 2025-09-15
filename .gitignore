@@ -1,0 +1,29 @@
+# Ambiente virtual Python
+venv/
+ENV/
+env/
+.venv/
+
+# Cache do Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Configurações do VSCode e outros editores
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# Node.js (frontend)
+frontend/node_modules/
+frontend/build/
+frontend/dist/
+
+# Outros arquivos que não devem ir para o repositório
+*.log
