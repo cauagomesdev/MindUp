@@ -12,7 +12,7 @@ const PacientesList: React.FC = () => {
   const [pacientes, setPacientes] = useState<Paciente[]>([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/pacientes/")
+    fetch("http://localhost:5000/pacientes/listar")
       .then((res) => res.json())
       .then((data) => setPacientes(data.pacientes))
       .catch((err) => console.error(err));

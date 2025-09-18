@@ -11,12 +11,12 @@ const ProfissionaisList: React.FC = () => {
   const [profissionais, setProfissionais] = useState<Profissional[]>([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/profissionais/")
+    fetch("http://localhost:5000/profissionais/listar")
       .then((res) => res.json())
       .then((data) => setProfissionais(data.profissionais))
       .catch((err) => console.error(err));
   }, []);
-
+  
   return (
     <div>
       <h1>Lista de Profissionais</h1>
