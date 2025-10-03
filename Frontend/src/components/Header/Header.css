@@ -1,0 +1,29 @@
+.header-container {
+    width: 100%;
+    padding: 10px 20px;
+    background-color: white;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header-logo-link {
+    text-decoration: none;
+}
+
+.header-logo-image {
+    height: 100px;
+    margin-right: 15px;
+}
+
+.header-texts {
+    margin:0 5px;
+}
+
+.header-title {
+    font-size: 25px;
+    margin: 0;
+}
+
