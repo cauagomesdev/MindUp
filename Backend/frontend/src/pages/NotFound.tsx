@@ -6,105 +6,76 @@ interface NotFoundProps {
 
 const NotFound: React.FC<NotFoundProps> = ({ onVoltar }) => {
   return (
-    <div style={{
+    <div className="fade-in" style={{
+      minHeight: "100vh",
+      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
       display: "flex",
-      flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      minHeight: "100vh",
-      background: "linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%)",
-      color: "white",
-      textAlign: "center",
       padding: "20px"
     }}>
       <div style={{
-        backgroundColor: "rgba(255, 255, 255, 0.95)",
-        padding: "60px 40px",
+        background: "rgba(255, 255, 255, 0.95)",
         borderRadius: "20px",
-        boxShadow: "0 20px 40px rgba(0,0,0,0.2)",
-        color: "#333",
-        maxWidth: "500px"
+        padding: "60px 40px",
+        maxWidth: "500px",
+        width: "100%",
+        textAlign: "center",
+        boxShadow: "0 20px 40px rgba(0,0,0,0.1)"
       }}>
-        <div style={{ fontSize: "8rem", marginBottom: "20px" }}>🤔</div>
+        <div style={{ fontSize: "8rem", marginBottom: "30px" }}>🤔</div>
         
-        <h1 style={{ 
-          fontSize: "4rem", 
-          marginBottom: "20px", 
-          color: "#ff6b6b",
-          fontWeight: "bold"
+        <h1 style={{
+          fontSize: "3rem",
+          fontWeight: "700",
+          color: "#e74c3c",
+          marginBottom: "20px"
         }}>
           404
         </h1>
         
-        <h2 style={{ 
-          fontSize: "2rem", 
-          marginBottom: "20px", 
-          color: "#333",
-          fontWeight: "600"
+        <h2 style={{
+          fontSize: "1.5rem",
+          color: "#2c3e50",
+          marginBottom: "20px"
         }}>
           Página não encontrada
         </h2>
         
-        <p style={{ 
-          fontSize: "1.2rem", 
-          marginBottom: "40px", 
-          color: "#666",
+        <p style={{
+          fontSize: "1.1rem",
+          color: "#6c757d",
+          marginBottom: "40px",
           lineHeight: "1.6"
         }}>
-          Ops! A página que você está procurando não existe ou foi movida.
+          Oops! A página que você está procurando não existe ou foi movida.
         </p>
-        
-        <div style={{
-          padding: "20px",
-          backgroundColor: "#fff3cd",
-          borderRadius: "8px",
-          marginBottom: "30px",
-          borderLeft: "4px solid #ffc107"
-        }}>
-          <p style={{ margin: 0, color: "#856404" }}>
-            💡 <strong>Dica:</strong> Verifique se digitou o endereço corretamente ou use o botão abaixo para voltar ao início.
-          </p>
-        </div>
         
         <button
           onClick={onVoltar}
           style={{
             padding: "15px 30px",
             fontSize: "1.1rem",
-            border: "none",
-            borderRadius: "10px",
-            backgroundColor: "#4ecdc4",
+            fontWeight: "600",
+            background: "linear-gradient(135deg, #4ecdc4 0%, #45b7b8 100%)",
             color: "white",
+            border: "none",
+            borderRadius: "12px",
             cursor: "pointer",
             transition: "all 0.3s ease",
-            fontWeight: "600",
             boxShadow: "0 4px 15px rgba(78, 205, 196, 0.3)"
           }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.backgroundColor = "#45b7b8";
+          onMouseEnter={(e) => {
             e.currentTarget.style.transform = "translateY(-2px)";
-            e.currentTarget.style.boxShadow = "0 6px 20px rgba(78, 205, 196, 0.4)";
+            e.currentTarget.style.boxShadow = "0 8px 25px rgba(78, 205, 196, 0.4)";
           }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.backgroundColor = "#4ecdc4";
+          onMouseLeave={(e) => {
             e.currentTarget.style.transform = "translateY(0)";
             e.currentTarget.style.boxShadow = "0 4px 15px rgba(78, 205, 196, 0.3)";
           }}
         >
           🏠 Voltar ao Início
         </button>
-
-        <div style={{ 
-          marginTop: "30px", 
-          fontSize: "0.9rem", 
-          color: "#999",
-          borderTop: "1px solid #eee",
-          paddingTop: "20px"
-        }}>
-          <p style={{ margin: 0 }}>
-            Se você acredita que isso é um erro, entre em contato com nossa equipe.
-          </p>
-        </div>
       </div>
     </div>
   );

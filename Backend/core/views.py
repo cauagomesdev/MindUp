@@ -7,6 +7,10 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import *
 from .serializers import *
 
+# Em views.py - Log de erros
+import logging
+logger = logging.getLogger(__name__)
+
 # Views para Paciente (mantendo compatibilidade com frontend)
 @method_decorator(csrf_exempt, name='dispatch')
 class PacienteListCreate(generics.ListCreateAPIView):
@@ -129,3 +133,11 @@ class UsuarioListCreate(generics.ListCreateAPIView):
             nivel_acesso=serializer.validated_data.get('nivel_acesso', 'colaborador'),
         )
         return Response({"message": "Usuário cadastrado com sucesso!"}, status=status.HTTP_201_CREATED)
+
+# Em views.py
+from rest_framework.pagination import PageNumberPagination
+
+class CustomPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100

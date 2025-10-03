@@ -6,350 +6,314 @@ interface DashboardProps {
   usuario: {
     id: string;
     nome: string;
-    tipo: "paciente" | "profissional";
-    email?: string;
+    nivel_acesso: string;
   };
   onLogout: () => void;
+  tipo: "paciente" | "profissional";
 }
 
-interface PacienteData {
+interface Paciente {
   id_paciente: string;
   nome: string;
   email: string;
   endereco: string;
-  comunidade_nome: string;
+  comunidade_nome?: string;
   criado_em: string;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ usuario, onLogout }) => {
-  const [meuPaciente, setMeuPaciente] = useState<PacienteData | null>(null);
-  const [carregando, setCarregando] = useState(false);
-  const [erro, setErro] = useState("");
+const Dashboard: React.FC<DashboardProps> = ({ usuario, onLogout, tipo }) => {
+  const [dadosPaciente, setDadosPaciente] = useState<Paciente | null>(null);
+  const [carregando, setCarregando] = useState(true);
 
   useEffect(() => {
-    if (usuario.tipo === "paciente" && usuario.email) {
-      setCarregando(true);
-      setErro("");
-      
-      // Buscar paciente pelo email em vez do ID
-      fetch(`http://localhost:8000/pacientes/listar`)
-        .then(res => {
-          if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status}`);
-          }
-          return res.json();
-        })
+    if (tipo === "paciente") {
+      // Buscar dados do paciente específico
+      fetch("http://localhost:8000/pacientes/listar")
+        .then(res => res.json())
         .then(data => {
-          console.log("Dados recebidos:", data); // Debug
-          
-          if (data.pacientes && Array.isArray(data.pacientes)) {
-            // Buscar paciente pelo email
-            const paciente = data.pacientes.find((p: PacienteData) => 
-              p.email === usuario.email
-            );
-            
-            if (paciente) {
-              setMeuPaciente(paciente);
-            } else {
-              setErro("Paciente não encontrado na base de dados.");
-            }
-          } else {
-            setErro("Formato de dados inesperado.");
-          }
+          const pacientes = data.pacientes || [];
+          const pacienteEncontrado = pacientes.find((p: Paciente) => p.id_paciente === usuario.id);
+          setDadosPaciente(pacienteEncontrado || null);
         })
         .catch(err => {
           console.error("Erro ao carregar dados do paciente:", err);
-          setErro("Erro ao carregar informações. Tente novamente.");
         })
         .finally(() => {
           setCarregando(false);
         });
+    } else {
+      setCarregando(false);
     }
-  }, [usuario]);
+  }, [usuario.id, tipo]);
 
-  return (
-    <div style={{ maxWidth: 1200, margin: "20px auto", padding: "20px" }}>
-      <div style={{ 
-        display: "flex", 
-        justifyContent: "space-between", 
-        alignItems: "center", 
-        marginBottom: "30px",
-        padding: "20px",
-        backgroundColor: "#f8f9fa",
-        borderRadius: "10px",
-        boxShadow: "0 2px 10px rgba(0,0,0,0.1)"
+  if (tipo === "paciente") {
+    return (
+      <div className="fade-in" style={{
+        minHeight: "100vh",
+        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        padding: "20px"
       }}>
-        <div>
-          <h2 style={{ margin: 0, color: "#333" }}>Bem-vindo, {usuario.nome}!</h2>
-          <p style={{ margin: "5px 0", color: "#666" }}>
-            {usuario.tipo === "profissional" ? "Painel Administrativo" : "Área do Paciente"}
-          </p>
-        </div>
-        <button 
-          onClick={onLogout} 
-          style={{ 
-            padding: "10px 20px", 
-            backgroundColor: "#e74c3c", 
-            color: "white", 
-            border: "none", 
-            borderRadius: "8px",
-            cursor: "pointer",
-            fontSize: "1rem",
-            fontWeight: "600",
-            transition: "all 0.3s ease"
-          }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.backgroundColor = "#c0392b";
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.backgroundColor = "#e74c3c";
-          }}
-        >
-          🚪 Sair
-        </button>
-      </div>
-      
-      {usuario.tipo === "profissional" ? (
-        <div>
-          <div style={{ 
-            display: "grid", 
-            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", 
-            gap: "30px",
-            marginBottom: "30px"
+        <div style={{ maxWidth: "900px", margin: "0 auto" }}>
+          {/* Header */}
+          <div style={{
+            background: "rgba(255, 255, 255, 0.95)",
+            borderRadius: "15px",
+            padding: "30px",
+            marginBottom: "30px",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap"
           }}>
-            <div style={{
-              backgroundColor: "white",
-              padding: "20px",
-              borderRadius: "10px",
-              boxShadow: "0 2px 10px rgba(0,0,0,0.1)"
-            }}>
-              <h3 style={{ color: "#4ecdc4", marginBottom: "20px" }}>📊 Estatísticas</h3>
-              <div style={{ display: "grid", gap: "10px" }}>
-                <div style={{ padding: "10px", backgroundColor: "#f8f9fa", borderRadius: "5px" }}>
-                  <strong>Pacientes Cadastrados:</strong> <span style={{color: "#4ecdc4"}}>Em tempo real</span>
-                </div>
-                <div style={{ padding: "10px", backgroundColor: "#f8f9fa", borderRadius: "5px" }}>
-                  <strong>Atendimentos Hoje:</strong> <span style={{color: "#6c5ce7"}}>0</span>
-                </div>
-                <div style={{ padding: "10px", backgroundColor: "#f8f9fa", borderRadius: "5px" }}>
-                  <strong>Comunidades Ativas:</strong> <span style={{color: "#2ed573"}}>3</span>
-                </div>
-              </div>
+            <div>
+              <h1 style={{
+                color: "#2c3e50",
+                fontSize: "2.5rem",
+                fontWeight: "700",
+                marginBottom: "10px"
+              }}>
+                👤 Painel do Paciente
+              </h1>
+              <p style={{
+                color: "#6c757d",
+                fontSize: "1.2rem",
+                margin: "0"
+              }}>
+                Bem-vindo, <strong>{usuario.nome}</strong>!
+              </p>
             </div>
-
-            <div style={{
-              backgroundColor: "white",
-              padding: "20px",
-              borderRadius: "10px",
-              boxShadow: "0 2px 10px rgba(0,0,0,0.1)"
-            }}>
-              <h3 style={{ color: "#6c5ce7", marginBottom: "20px" }}>🔗 Links Rápidos</h3>
-              <div style={{ display: "grid", gap: "10px" }}>
-                <button 
-                  style={{
-                    padding: "10px",
-                    backgroundColor: "#4ecdc4",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                    transition: "all 0.3s ease"
-                  }}
-                  onClick={() => alert("Funcionalidade em desenvolvimento")}
-                >
-                  📋 Novo Atendimento
-                </button>
-                <button 
-                  style={{
-                    padding: "10px",
-                    backgroundColor: "#6c5ce7",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                    transition: "all 0.3s ease"
-                  }}
-                  onClick={() => alert("Funcionalidade em desenvolvimento")}
-                >
-                  📅 Agenda do Dia
-                </button>
-                <a 
-                  href="http://localhost:8000/admin" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  style={{
-                    padding: "10px",
-                    backgroundColor: "#ff6b6b",
-                    color: "white",
-                    textDecoration: "none",
-                    borderRadius: "5px",
-                    textAlign: "center",
-                    display: "block",
-                    transition: "all 0.3s ease"
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.backgroundColor = "#ff5252";
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.backgroundColor = "#ff6b6b";
-                  }}
-                >
-                  ⚙️ Admin Django
-                </a>
-              </div>
-            </div>
+            
+            <button
+              onClick={onLogout}
+              style={{
+                padding: "12px 24px",
+                background: "linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)",
+                color: "white",
+                border: "none",
+                borderRadius: "10px",
+                fontSize: "1rem",
+                fontWeight: "600",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                boxShadow: "0 4px 15px rgba(231, 76, 60, 0.3)"
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-2px)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+              }}
+            >
+              🚪 Sair
+            </button>
           </div>
 
-          <div style={{ marginBottom: "30px" }}>
-            <h3 style={{ color: "#333", marginBottom: "20px" }}>👥 Pacientes Cadastrados</h3>
-            <PacientesList />
+          {/* Dados do Paciente */}
+          <div style={{
+            background: "rgba(255, 255, 255, 0.95)",
+            borderRadius: "15px",
+            padding: "30px",
+            marginBottom: "30px",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.1)"
+          }}>
+            <h2 style={{
+              color: "#2c3e50",
+              fontSize: "1.8rem",
+              fontWeight: "600",
+              marginBottom: "25px",
+              borderBottom: "2px solid #4ecdc4",
+              paddingBottom: "10px"
+            }}>
+              📋 Meus Dados
+            </h2>
+
+            {carregando ? (
+              <div style={{ textAlign: "center", padding: "40px" }}>
+                <div className="loading" style={{ margin: "0 auto 20px" }}></div>
+                <p style={{ color: "#6c757d" }}>Carregando seus dados...</p>
+              </div>
+            ) : dadosPaciente ? (
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+                gap: "20px"
+              }}>
+                <div style={{
+                  padding: "20px",
+                  background: "linear-gradient(135deg, #4ecdc4 0%, #45b7b8 100%)",
+                  borderRadius: "10px",
+                  color: "white"
+                }}>
+                  <h3 style={{ color: "white", marginBottom: "10px" }}>👤 Nome</h3>
+                  <p style={{ fontSize: "1.1rem", margin: "0" }}>{dadosPaciente.nome}</p>
+                </div>
+
+                <div style={{
+                  padding: "20px",
+                  background: "linear-gradient(135deg, #6c5ce7 0%, #5f4fcf 100%)",
+                  borderRadius: "10px",
+                  color: "white"
+                }}>
+                  <h3 style={{ color: "white", marginBottom: "10px" }}>📧 Email</h3>
+                  <p style={{ fontSize: "1.1rem", margin: "0" }}>{dadosPaciente.email}</p>
+                </div>
+
+                <div style={{
+                  padding: "20px",
+                  background: "linear-gradient(135deg, #2ed573 0%, #17a2b8 100%)",
+                  borderRadius: "10px",
+                  color: "white"
+                }}>
+                  <h3 style={{ color: "white", marginBottom: "10px" }}>🏠 Endereço</h3>
+                  <p style={{ fontSize: "1.1rem", margin: "0" }}>
+                    {dadosPaciente.endereco || "Não informado"}
+                  </p>
+                </div>
+
+                <div style={{
+                  padding: "20px",
+                  background: "linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%)",
+                  borderRadius: "10px",
+                  color: "white"
+                }}>
+                  <h3 style={{ color: "white", marginBottom: "10px" }}>🏘️ Comunidade</h3>
+                  <p style={{ fontSize: "1.1rem", margin: "0" }}>
+                    {dadosPaciente.comunidade_nome || "Não informado"}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div style={{ textAlign: "center", padding: "40px" }}>
+                <div style={{ fontSize: "3rem", marginBottom: "20px" }}>❌</div>
+                <p style={{ color: "#e74c3c", fontSize: "1.1rem" }}>
+                  Não foi possível carregar seus dados.
+                </p>
+              </div>
+            )}
           </div>
-          
-          <div>
-            <h3 style={{ color: "#333", marginBottom: "20px" }}>👨‍⚕️ Profissionais do Sistema</h3>
-            <ProfissionaisList />
+
+          {/* Próximas funcionalidades */}
+          <div style={{
+            background: "rgba(255, 255, 255, 0.95)",
+            borderRadius: "15px",
+            padding: "30px",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.1)"
+          }}>
+            <h2 style={{
+              color: "#2c3e50",
+              fontSize: "1.8rem",
+              fontWeight: "600",
+              marginBottom: "25px",
+              borderBottom: "2px solid #6c5ce7",
+              paddingBottom: "10px"
+            }}>
+              🚀 Próximas Funcionalidades
+            </h2>
+
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+              gap: "20px"
+            }}>
+              {[
+                { icon: "📅", titulo: "Agendamentos", desc: "Agende consultas" },
+                { icon: "💬", titulo: "Chat", desc: "Converse com profissionais" },
+                { icon: "📊", titulo: "Relatórios", desc: "Acompanhe seu progresso" },
+                { icon: "📚", titulo: "Recursos", desc: "Material educativo" }
+              ].map((item, index) => (
+                <div key={index} style={{
+                  padding: "20px",
+                  background: "#f8f9fa",
+                  borderRadius: "10px",
+                  textAlign: "center",
+                  border: "2px dashed #dee2e6"
+                }}>
+                  <div style={{ fontSize: "2rem", marginBottom: "10px" }}>{item.icon}</div>
+                  <h4 style={{ color: "#2c3e50", marginBottom: "5px" }}>{item.titulo}</h4>
+                  <p style={{ color: "#6c757d", fontSize: "0.9rem", margin: "0" }}>{item.desc}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      ) : (
+      </div>
+    );
+  }
+
+  // Dashboard Profissional
+  return (
+    <div className="fade-in" style={{
+      minHeight: "100vh",
+      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+      padding: "20px"
+    }}>
+      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+        {/* Header */}
         <div style={{
-          backgroundColor: "white",
+          background: "rgba(255, 255, 255, 0.95)",
+          borderRadius: "15px",
           padding: "30px",
-          borderRadius: "10px",
-          boxShadow: "0 2px 10px rgba(0,0,0,0.1)"
+          marginBottom: "30px",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap"
         }}>
-          <h3 style={{ color: "#4ecdc4", marginBottom: "20px" }}>📋 Suas Informações</h3>
+          <div>
+            <h1 style={{
+              color: "#2c3e50",
+              fontSize: "2.5rem",
+              fontWeight: "700",
+              marginBottom: "10px"
+            }}>
+              👨‍⚕️ Painel Administrativo
+            </h1>
+            <p style={{
+              color: "#6c757d",
+              fontSize: "1.2rem",
+              margin: "0"
+            }}>
+              Bem-vindo, <strong>{usuario.nome}</strong> - {usuario.nivel_acesso}
+            </p>
+          </div>
           
-          {carregando ? (
-            <div style={{ textAlign: "center", padding: "40px" }}>
-              <div style={{ fontSize: "2rem", marginBottom: "20px" }}>⏳</div>
-              <p>Carregando suas informações...</p>
-            </div>
-          ) : erro ? (
-            <div style={{ 
-              padding: "20px",
-              backgroundColor: "#f8d7da",
-              border: "1px solid #f5c6cb",
-              borderRadius: "8px",
-              color: "#721c24"
-            }}>
-              <p style={{ margin: 0 }}>
-                ⚠️ {erro}
-              </p>
-              <button 
-                onClick={() => window.location.reload()}
-                style={{
-                  marginTop: "10px",
-                  padding: "8px 16px",
-                  backgroundColor: "#dc3545",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "5px",
-                  cursor: "pointer"
-                }}
-              >
-                🔄 Tentar Novamente
-              </button>
-            </div>
-          ) : meuPaciente ? (
-            <div style={{ marginTop: 16 }}>
-              <table style={{ 
-                borderCollapse: "collapse", 
-                width: "100%",
-                backgroundColor: "white",
-                borderRadius: "8px",
-                overflow: "hidden",
-                boxShadow: "0 2px 10px rgba(0,0,0,0.1)"
-              }}>
-                <tbody>
-                  <tr style={{ backgroundColor: "#f8f9fa" }}>
-                    <td style={{ padding: "15px", fontWeight: "bold", borderBottom: "1px solid #eee", width: "200px" }}>
-                      👤 Nome:
-                    </td>
-                    <td style={{ padding: "15px", borderBottom: "1px solid #eee" }}>
-                      {meuPaciente.nome}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style={{ padding: "15px", fontWeight: "bold", borderBottom: "1px solid #eee", backgroundColor: "#f8f9fa" }}>
-                      📧 Email:
-                    </td>
-                    <td style={{ padding: "15px", borderBottom: "1px solid #eee" }}>
-                      {meuPaciente.email}
-                    </td>
-                  </tr>
-                  <tr style={{ backgroundColor: "#f8f9fa" }}>
-                    <td style={{ padding: "15px", fontWeight: "bold", borderBottom: "1px solid #eee" }}>
-                      🏠 Endereço:
-                    </td>
-                    <td style={{ padding: "15px", borderBottom: "1px solid #eee" }}>
-                      {meuPaciente.endereco || "Não informado"}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style={{ padding: "15px", fontWeight: "bold", borderBottom: "1px solid #eee", backgroundColor: "#f8f9fa" }}>
-                      🏘️ Comunidade:
-                    </td>
-                    <td style={{ padding: "15px", borderBottom: "1px solid #eee" }}>
-                      {meuPaciente.comunidade_nome || "Não informada"}
-                    </td>
-                  </tr>
-                  <tr style={{ backgroundColor: "#f8f9fa" }}>
-                    <td style={{ padding: "15px", fontWeight: "bold", borderBottom: "1px solid #eee" }}>
-                      📅 Data de Cadastro:
-                    </td>
-                    <td style={{ padding: "15px", borderBottom: "1px solid #eee" }}>
-                      {meuPaciente.criado_em ? 
-                        new Date(meuPaciente.criado_em).toLocaleDateString('pt-BR') : 
-                        "Não disponível"
-                      }
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style={{ padding: "15px", fontWeight: "bold", backgroundColor: "#f8f9fa" }}>
-                      🆔 ID:
-                    </td>
-                    <td style={{ 
-                      padding: "15px", 
-                      fontSize: "0.8em", 
-                      color: "#666", 
-                      fontFamily: "monospace",
-                      wordBreak: "break-all"
-                    }}>
-                      {meuPaciente.id_paciente}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-
-              <div style={{ 
-                marginTop: "30px",
-                padding: "20px",
-                backgroundColor: "#e8f8f5",
-                borderRadius: "8px",
-                borderLeft: "4px solid #4ecdc4"
-              }}>
-                <h4 style={{ color: "#4ecdc4", marginBottom: "10px" }}>💚 Próximos Passos</h4>
-                <ul style={{ margin: 0, paddingLeft: "20px", color: "#666" }}>
-                  <li>Aguarde contato da equipe para agendamento</li>
-                  <li>Mantenha seus dados atualizados</li>
-                  <li>Participe das atividades comunitárias</li>
-                </ul>
-              </div>
-            </div>
-          ) : (
-            <div style={{ 
-              padding: "20px",
-              backgroundColor: "#fff3cd",
-              borderRadius: "8px",
-              borderLeft: "4px solid #ffc107"
-            }}>
-              <p style={{ margin: 0, color: "#856404" }}>
-                ⚠️ Suas informações não foram encontradas. Faça login novamente ou entre em contato com o suporte.
-              </p>
-            </div>
-          )}
+          <button
+            onClick={onLogout}
+            style={{
+              padding: "12px 24px",
+              background: "linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)",
+              color: "white",
+              border: "none",
+              borderRadius: "10px",
+              fontSize: "1rem",
+              fontWeight: "600",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              boxShadow: "0 4px 15px rgba(231, 76, 60, 0.3)"
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-2px)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+            }}
+          >
+            🚪 Sair
+          </button>
         </div>
-      )}
+
+        {/* Listas */}
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(500px, 1fr))",
+          gap: "30px"
+        }}>
+          <PacientesList />
+          <ProfissionaisList />
+        </div>
+      </div>
     </div>
   );
 };
