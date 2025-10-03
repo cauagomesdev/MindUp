@@ -18,6 +18,12 @@ const Login: React.FC<LoginProps> = ({ tipo, onVoltar, onLogin }) => {
     e.preventDefault();
     setErro("");
     
+    // Validação básica
+    if (!form.email || !form.senha) {
+      setErro("Por favor, preencha todos os campos.");
+      return;
+    }
+    
     fetch(`http://localhost:8000/auth/login/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
