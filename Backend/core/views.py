@@ -110,6 +110,10 @@ class UsuarioListCreate(generics.ListCreateAPIView):
     queryset = Usuario.objects.all().order_by('nome_login')
     serializer_class = UsuarioSerializer
 
+    def list(self, request, *args, **kwargs):
+        serializer = self.get_serializer(self.get_queryset(), many=True)
+        return Response(serializer.data)  # Retorna lista direta para ProfissionaisList
+
     def create(self, request, *args, **kwargs):
         data = request.data.copy()
         senha = data.pop('senha', None)

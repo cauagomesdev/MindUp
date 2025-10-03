@@ -27,3 +27,11 @@ frontend/dist/
 
 # Outros arquivos que não devem ir para o repositório
 *.log
+
+# Arquivos de Banco de Dados
+*.db
+*.sqlite3
+
+# Arquivos de ambiente com segredos (NUNCA ENVIAR PARA O GITHUB)
+.env
+.env.local

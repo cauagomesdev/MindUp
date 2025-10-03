@@ -1,66 +1,72 @@
 import React, { useState } from "react";
 import Home from "./pages/Home";
-import PacientesList from "./components/PacientesList";
-import ProfissionaisList from "./components/ProfissionaisList";
 import CadastroPaciente from "./components/CadastroPaciente";
 import CadastroProfissional from "./components/CadastroProfissional";
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
+import "./App.css";
 
-type Usuario = {
+interface Usuario {
   id: string;
   nome: string;
   tipo: "paciente" | "profissional";
   email?: string;
-};
+}
+
+type Tela = "home" | "cadastro-paciente" | "cadastro-profissional" | "login-paciente" | "login-funcionario" | "dashboard";
 
 const App: React.FC = () => {
-  const [tela, setTela] = useState<"home" | "login" | "cadastro" | "dashboard">("home");
-  const [tipo, setTipo] = useState<"paciente" | "funcionario">("paciente");
-  const [usuario, setUsuario] = useState<Usuario | null>(null);
+  const [telaAtual, setTelaAtual] = useState<Tela>("home");
+  const [usuarioLogado, setUsuarioLogado] = useState<Usuario | null>(null);
 
-  const handleSelect = (acao: "login" | "cadastro", tipoSelecionado: "paciente" | "funcionario") => {
-    setTipo(tipoSelecionado);
-    setTela(acao);
-  };
-
-  const handleLogin = (user: Usuario) => {
-    setUsuario(user);
-    setTela("dashboard");
+  const handleLogin = (usuario: Usuario) => {
+    setUsuarioLogado(usuario);
+    setTelaAtual("dashboard");
   };
 
   const handleLogout = () => {
-    setUsuario(null);
-    setTela("home");
+    setUsuarioLogado(null);
+    setTelaAtual("home");
   };
 
-  if (tela === "cadastro") {
-    if (tipo === "paciente") {
-      return <CadastroPaciente onVoltar={() => setTela("home")} />;
-    } else {
-      return <CadastroProfissional onVoltar={() => setTela("home")} />;
-    }
-  }
-
-  if (tela === "login") {
-    return (
-      <Login
-        tipo={tipo}
-        onVoltar={() => setTela("home")}
-        onLogin={handleLogin}
-      />
-    );
-  }
-
-  if (tela === "dashboard" && usuario) {
-    return (
-      <Dashboard usuario={usuario} onLogout={handleLogout} />
-    );
+  if (usuarioLogado) {
+    return <Dashboard usuario={usuarioLogado} onLogout={handleLogout} />;
   }
 
   return (
-    <div style={{ fontFamily: "Arial" }}>
-      <Home onSelect={handleSelect} />
+    <div className="App">
+      {telaAtual === "home" && (
+        <Home
+          onCadastrarPaciente={() => setTelaAtual("cadastro-paciente")}
+          onCadastrarProfissional={() => setTelaAtual("cadastro-profissional")}
+          onLoginPaciente={() => setTelaAtual("login-paciente")}
+          onLoginFuncionario={() => setTelaAtual("login-funcionario")}
+        />
+      )}
+
+      {telaAtual === "cadastro-paciente" && (
+        <CadastroPaciente onVoltar={() => setTelaAtual("home")} />
+      )}
+
+      {telaAtual === "cadastro-profissional" && (
+        <CadastroProfissional onVoltar={() => setTelaAtual("home")} />
+      )}
+
+      {telaAtual === "login-paciente" && (
+        <Login
+          tipo="paciente"
+          onVoltar={() => setTelaAtual("home")}
+          onLogin={handleLogin}
+        />
+      )}
+
+      {telaAtual === "login-funcionario" && (
+        <Login
+          tipo="funcionario"
+          onVoltar={() => setTelaAtual("home")}
+          onLogin={handleLogin}
+        />
+      )}
     </div>
   );
 };
