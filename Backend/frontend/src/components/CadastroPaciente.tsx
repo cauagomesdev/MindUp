@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface CadastroPacienteProps {
   onVoltar: () => void;
@@ -9,17 +9,26 @@ const CadastroPaciente: React.FC<CadastroPacienteProps> = ({ onVoltar }) => {
     nome: "",
     email: "",
     senha: "",
-    data_nascimento: "",
-    comunidade: "",
+    endereco: "",
+    id_comunidade: "",
   });
+  const [comunidades, setComunidades] = useState<any[]>([]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Carregar comunidades do backend
+  useEffect(() => {
+    fetch("http://localhost:8000/comunidades/")
+      .then(res => res.json())
+      .then(data => setComunidades(data.comunidades))
+      .catch(err => console.error("Erro ao carregar comunidades:", err));
+  }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    fetch("http://localhost:5000/pacientes/", {
+    fetch("http://localhost:8000/pacientes/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
@@ -35,11 +44,53 @@ const CadastroPaciente: React.FC<CadastroPacienteProps> = ({ onVoltar }) => {
   return (
     <form onSubmit={handleSubmit} style={{ maxWidth: 400, margin: "40px auto" }}>
       <h2>Cadastro de Paciente</h2>
-      <input name="nome" placeholder="Nome" value={form.nome} onChange={handleChange} required style={{ width: "100%", marginBottom: 8 }} />
-      <input name="email" placeholder="Email" type="email" value={form.email} onChange={handleChange} required style={{ width: "100%", marginBottom: 8 }} />
-      <input name="senha" placeholder="Senha" type="password" value={form.senha} onChange={handleChange} required style={{ width: "100%", marginBottom: 8 }} />
-      <input name="data_nascimento" placeholder="Data de Nascimento" type="date" value={form.data_nascimento} onChange={handleChange} required style={{ width: "100%", marginBottom: 8 }} />
-      <input name="comunidade" placeholder="Comunidade" value={form.comunidade} onChange={handleChange} required style={{ width: "100%", marginBottom: 16 }} />
+      <input 
+        name="nome" 
+        placeholder="Nome" 
+        value={form.nome} 
+        onChange={handleChange} 
+        required 
+        style={{ width: "100%", marginBottom: 8 }} 
+      />
+      <input 
+        name="email" 
+        placeholder="Email" 
+        type="email" 
+        value={form.email} 
+        onChange={handleChange} 
+        required 
+        style={{ width: "100%", marginBottom: 8 }} 
+      />
+      <input 
+        name="senha" 
+        placeholder="Senha" 
+        type="password" 
+        value={form.senha} 
+        onChange={handleChange} 
+        required 
+        style={{ width: "100%", marginBottom: 8 }} 
+      />
+      <input 
+        name="endereco" 
+        placeholder="Endereço" 
+        value={form.endereco} 
+        onChange={handleChange} 
+        style={{ width: "100%", marginBottom: 8 }} 
+      />
+      <select 
+        name="id_comunidade" 
+        value={form.id_comunidade} 
+        onChange={handleChange} 
+        required 
+        style={{ width: "100%", marginBottom: 16 }}
+      >
+        <option value="">Selecione uma comunidade</option>
+        {comunidades.map(c => (
+          <option key={c.id_comunidade} value={c.id_comunidade}>
+            {c.nome}
+          </option>
+        ))}
+      </select>
       <button type="submit" style={{ width: "100%", padding: 10 }}>Cadastrar</button>
       <button type="button" onClick={onVoltar} style={{ width: "100%", marginTop: 8 }}>Voltar</button>
     </form>

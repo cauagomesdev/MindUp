@@ -1,0 +1,131 @@
+-- Remover banco anterior se existir e criar novo
+DROP DATABASE IF EXISTS mindupdb;
+CREATE DATABASE mindupdb;
+
+-- Conectar ao banco mindupdb
+\c mindupdb;
+
+-- Extensão para UUID
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Tabela Comunidade
+CREATE TABLE comunidade (
+    id_comunidade UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    nome VARCHAR(100) NOT NULL,
+    localizacao VARCHAR(200),
+    descricao TEXT
+);
+
+-- Tabela Espaço Comunitário
+CREATE TABLE espaco_comunitario (
+    id_espaco_comunitario UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    nome VARCHAR(100) NOT NULL,
+    endereco VARCHAR(200),
+    capacidade INTEGER,
+    responsavel VARCHAR(100),
+    id_comunidade UUID REFERENCES comunidade(id_comunidade) ON DELETE CASCADE
+);
+
+-- Tabela Paciente
+CREATE TABLE paciente (
+    id_paciente UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    senha_hash TEXT NOT NULL,
+    endereco VARCHAR(200),
+    id_comunidade UUID REFERENCES comunidade(id_comunidade) ON DELETE SET NULL,
+    criado_em TIMESTAMP DEFAULT NOW()
+);
+
+-- Tabela Colaborador
+CREATE TABLE colaborador (
+    id_colaborador UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    nome VARCHAR(100) NOT NULL,
+    cpf VARCHAR(14) UNIQUE NOT NULL,
+    endereco VARCHAR(200),
+    contato VARCHAR(20),
+    criado_em TIMESTAMP DEFAULT NOW()
+);
+
+-- Tabela Disponibilidade
+CREATE TABLE disponibilidade (
+    id_disponibilidade UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    dia_semana VARCHAR(20) NOT NULL,
+    hora_inicio TIME NOT NULL,
+    hora_fim TIME NOT NULL,
+    id_colaborador UUID REFERENCES colaborador(id_colaborador) ON DELETE CASCADE
+);
+
+-- Tabela Voluntário
+CREATE TABLE voluntario (
+    id_voluntario UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    nome VARCHAR(100) NOT NULL,
+    contato VARCHAR(20),
+    universidade VARCHAR(100),
+    especialidade VARCHAR(100),
+    id_colaborador UUID REFERENCES colaborador(id_colaborador) ON DELETE CASCADE
+);
+
+-- Tabela Usuário (para login/auth)
+CREATE TABLE usuario (
+    id_usuario UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    nome_login VARCHAR(50) UNIQUE NOT NULL,
+    senha_hash TEXT NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    nivel_acesso VARCHAR(20) CHECK (nivel_acesso IN ('admin', 'colaborador', 'voluntario', 'paciente')) DEFAULT 'paciente',
+    criado_em TIMESTAMP DEFAULT NOW()
+);
+
+-- Tabela Atendimento
+CREATE TABLE atendimento (
+    id_atendimento UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    data DATE NOT NULL,
+    horario TIME NOT NULL,
+    tipo_atendimento VARCHAR(50),
+    status VARCHAR(20) CHECK (status IN ('agendado', 'realizado', 'cancelado')) DEFAULT 'agendado',
+    id_espaco_comunitario UUID REFERENCES espaco_comunitario(id_espaco_comunitario) ON DELETE SET NULL,
+    id_paciente UUID REFERENCES paciente(id_paciente) ON DELETE CASCADE,
+    criado_em TIMESTAMP DEFAULT NOW()
+);
+
+-- Tabela de relacionamento Paciente-Atendimento (muitos para muitos)
+CREATE TABLE participar (
+    id_participar UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id_atendimento UUID REFERENCES atendimento(id_atendimento) ON DELETE CASCADE,
+    id_paciente UUID REFERENCES paciente(id_paciente) ON DELETE CASCADE,
+    UNIQUE(id_atendimento, id_paciente)
+);
+
+-- Tabela Acompanhamento
+CREATE TABLE acompanhamento (
+    id_acompanhamento UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    data_inicio DATE NOT NULL,
+    descricao TEXT,
+    situacao VARCHAR(50),
+    id_paciente UUID REFERENCES paciente(id_paciente) ON DELETE CASCADE,
+    criado_em TIMESTAMP DEFAULT NOW()
+);
+
+-- Índices para melhorar performance
+CREATE INDEX idx_paciente_comunidade ON paciente(id_comunidade);
+CREATE INDEX idx_atendimento_paciente ON atendimento(id_paciente);
+CREATE INDEX idx_atendimento_espaco ON atendimento(id_espaco_comunitario);
+CREATE INDEX idx_disponibilidade_colaborador ON disponibilidade(id_colaborador);
+CREATE INDEX idx_voluntario_colaborador ON voluntario(id_colaborador);
+CREATE INDEX idx_participar_atendimento ON participar(id_atendimento);
+CREATE INDEX idx_participar_paciente ON participar(id_paciente);
+CREATE INDEX idx_acompanhamento_paciente ON acompanhamento(id_paciente);
+
+-- Inserir dados iniciais
+INSERT INTO comunidade (nome, localizacao, descricao) VALUES 
+('Samambaia Norte', 'Samambaia Norte - DF', 'Comunidade na região administrativa de Samambaia'),
+('Ceilândia Norte', 'Ceilândia Norte - DF', 'Comunidade na região de Ceilândia'),
+('Planaltina', 'Planaltina - DF', 'Comunidade rural do Distrito Federal');
+
+INSERT INTO espaco_comunitario (nome, endereco, capacidade, responsavel, id_comunidade) VALUES 
+('Centro Comunitário Samambaia', 'QN 123 Conjunto A - Samambaia Norte', 50, 'Maria Santos', (SELECT id_comunidade FROM comunidade WHERE nome = 'Samambaia Norte')),
+('Espaço Cultural Ceilândia', 'QNM 456 - Ceilândia Norte', 30, 'João Silva', (SELECT id_comunidade FROM comunidade WHERE nome = 'Ceilândia Norte'));
+
+-- Dados exemplo de usuário admin
+INSERT INTO usuario (nome_login, senha_hash, email, nivel_acesso) VALUES 
+('admin', 'pbkdf2_sha256$600000$salt$hash', 'admin@mindup.com', 'admin');

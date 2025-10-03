@@ -11,7 +11,7 @@ const ProfissionaisList: React.FC = () => {
   const [profissionais, setProfissionais] = useState<Profissional[]>([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/profissionais/listar")
+    fetch("http://localhost:8000/profissionais/listar")
       .then((res) => res.json())
       .then((data) => setProfissionais(data.profissionais))
       .catch((err) => console.error(err));

@@ -17,10 +17,15 @@ const Login: React.FC<LoginProps> = ({ tipo, onVoltar, onLogin }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErro("");
-    fetch(`http://localhost:5000/auth/login/${tipo === "paciente" ? "paciente" : "profissional"}`, {
+    
+    // Usar novo endpoint unificado
+    fetch(`http://localhost:8000/auth/login/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({
+        nome_login: form.email,  // Pode usar email como login
+        senha: form.senha
+      }),
     })
       .then(async (res) => {
         const data = await res.json();
@@ -28,7 +33,7 @@ const Login: React.FC<LoginProps> = ({ tipo, onVoltar, onLogin }) => {
           onLogin({
             id: data.id,
             nome: data.nome,
-            tipo: tipo === "paciente" ? "paciente" : "profissional",
+            tipo: data.nivel_acesso === "admin" ? "profissional" : "paciente",
             email: form.email,
           });
         } else {
@@ -40,7 +45,8 @@ const Login: React.FC<LoginProps> = ({ tipo, onVoltar, onLogin }) => {
 
   return (
     <form onSubmit={handleSubmit} style={{ maxWidth: 400, margin: "40px auto" }}>
-      <h2>Login de {tipo === "paciente" ? "Paciente" : "Funcionário"}</h2>
+      <h2>Login - {tipo === "paciente" ? "Paciente" : "Funcionário"}</h2>
+      {erro && <p style={{ color: "red" }}>{erro}</p>}
       <input
         name="email"
         placeholder="Email"
@@ -59,9 +65,12 @@ const Login: React.FC<LoginProps> = ({ tipo, onVoltar, onLogin }) => {
         required
         style={{ width: "100%", marginBottom: 16 }}
       />
-      <button type="submit" style={{ width: "100%", padding: 10 }}>Entrar</button>
-      <button type="button" onClick={onVoltar} style={{ width: "100%", marginTop: 8 }}>Voltar</button>
-      {erro && <div style={{ color: "red", marginTop: 12 }}>{erro}</div>}
+      <button type="submit" style={{ width: "100%", padding: 10 }}>
+        Entrar
+      </button>
+      <button type="button" onClick={onVoltar} style={{ width: "100%", marginTop: 8 }}>
+        Voltar
+      </button>
     </form>
   );
 };
