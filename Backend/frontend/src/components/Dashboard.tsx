@@ -40,10 +40,9 @@ const Dashboard: React.FC<DashboardProps> = ({ usuario, onLogout }) => {
           return res.json();
         })
         .then(data => {
-          console.log("Dados recebidos:", data); // Debug
+          console.log("Dados recebidos:", data); // Debug - pode remover depois
           
-          if (data.pacientes && Array.isArray(data.pacientes)) {
-            // Buscar paciente pelo email
+          if (data && data.pacientes && Array.isArray(data.pacientes)) {
             const paciente = data.pacientes.find((p: PacienteData) => 
               p.email === usuario.email
             );
