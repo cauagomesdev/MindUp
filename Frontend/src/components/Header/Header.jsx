@@ -25,8 +25,8 @@ function Header() {
           <Link to="/">Sobre nós</Link>
           <Link to="/">Suporte</Link>
           <Link to="/">Agendamento</Link>
-          <Link to="/">Cadastre-se</Link>
-          <Link to="/">Entrar</Link>
+          <Link className="register" to="/">Cadastre-se</Link>
+          <Link className="login" to="/">Entrar</Link>      
       </nav>
 
     </header>
