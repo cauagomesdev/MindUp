@@ -27,3 +27,32 @@
     margin: 0;
 }
 
+.header-nav {
+    margin-left: auto;
+}
+
+.header-nav a {
+    margin: 0 10px;
+    text-decoration: none;
+    color: #00796b;
+    font-weight: 500;
+}
+
+.header-nav a:hover {
+    color: #004d40;
+}
+
+.register {
+    padding: 10px 20px;
+    border-style:solid;
+    border-color: black;
+    background-color: white;
+}
+
+.login {
+    padding: 10px 40px;
+    border-style:solid;
+    border-color: black;
+    background-color: black;
+    border-radius: 5px;
+}
