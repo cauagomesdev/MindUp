@@ -1,0 +1,16 @@
+.home-main {
+    display: flex;
+}
+
+.home-img {
+    width: 50%;
+}
+
+.home-main-components {
+    justify-content: space-evenly;
+}
+
+.home-footer {
+    background-color: white;
+    display: flex;
+}
