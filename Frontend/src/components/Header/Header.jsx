@@ -1,7 +1,7 @@
 import React from "react";
 import {Link} from "react-router-dom";
 import "./Header.css";
-import logoMindUp from "../../assets/MindUp svg.svg"
+import logoMindUp from "../../assets/MindUp svg.svg";
 
 function Header() {
   return (
@@ -24,7 +24,7 @@ function Header() {
       <nav className="header-nav">    
           <Link to="/">Sobre nós</Link>
           <Link to="/">Suporte</Link>
-          <Link to="/">Agendamento</Link>
+          <Link to="/">Agendamentos</Link>
           <Link className="register" to="/">Cadastre-se</Link>
           <Link className="login" to="/">Entrar</Link>      
       </nav>
