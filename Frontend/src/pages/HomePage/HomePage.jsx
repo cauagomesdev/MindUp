@@ -1,8 +1,8 @@
 import React from 'react';
 import {Link} from "react-router-dom";
-import "./Home.css";
+import "./HomePage.css";
 import imgroda from "../../assets/roda de conversa startup.webp";
-
+import Button from '../../components/Button/Button';
 
 function Home() { 
   return (
@@ -24,8 +24,8 @@ function Home() {
         </div>
 
         <div className='home-buttons'>
-          <Link to="/agendamentos" className='btn primary'>Agendar Consulta</Link>
-          <Link to="/pacientes/evolucao" className='btn secondary'>Acompanhar evolução</Link>
+          <Button to="/agendamentos" className="primary">Agendar Consulta</Button>
+          <Button to="/pacientes/evolucao" className="secondary">Acompanhar Evolução</Button>
         </div>
       </div>
 

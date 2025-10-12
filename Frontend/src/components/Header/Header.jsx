@@ -2,6 +2,7 @@ import React from "react";
 import {Link} from "react-router-dom";
 import "./Header.css";
 import logoMindUp from "../../assets/MindUp svg.svg";
+import Button from "../Button/Button";
 
 function Header() {
   return (
@@ -29,8 +30,10 @@ function Header() {
       </nav>
 
       <div className="header-auth-buttons">
-          <Link className="btn primary" to="/cadastro">Cadastre-se</Link>
-          <Link className="btn secondary" to="/login">Entrar</Link>      
+          <Button to="/cadastro" className="secondary">Cadastre-se</Button>
+          <Button to="/login" className="primary">Entrar</Button>
+          {/* <Link className="btn primary" to="/cadastro">Cadastre-se</Link>
+          <Link className="btn secondary" to="/login">Entrar</Link>       */}
       </div>
 
     </header>
