@@ -31,7 +31,7 @@ function Header() {
 
       <div className="header-auth-buttons">
           <Button to="/cadastro" className="secondary">Cadastre-se</Button>
-          <Button to="/loginPage" className="primary">Entrar</Button>
+          <Button to="/login" className="primary">Entrar</Button>
       </div>
 
     </header>
