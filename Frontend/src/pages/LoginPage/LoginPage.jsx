@@ -1,7 +1,6 @@
 import React from "react";
 import {Link} from "react-router-dom";
 import "./LoginPage.css";
-import Button from "../Button/Button";
 import imgmulher from "../../assets/mulher-terapeuta.jpg";
 
 function LoginPage() {
