@@ -31,9 +31,7 @@ function Header() {
 
       <div className="header-auth-buttons">
           <Button to="/cadastro" className="secondary">Cadastre-se</Button>
-          <Button to="/login" className="primary">Entrar</Button>
-          {/* <Link className="btn primary" to="/cadastro">Cadastre-se</Link>
-          <Link className="btn secondary" to="/login">Entrar</Link>       */}
+          <Button to="/loginPage" className="primary">Entrar</Button>
       </div>
 
     </header>
