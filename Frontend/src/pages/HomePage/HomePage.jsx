@@ -1,5 +1,4 @@
 import React from 'react';
-import {Link} from "react-router-dom";
 import "./HomePage.css";
 import imgroda from "../../assets/roda de conversa startup.webp";
 import Button from '../../components/Button/Button';
