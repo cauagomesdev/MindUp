@@ -4,14 +4,16 @@ import Input from "../../components/Input/Input";
 import Button from "../../components/Button/Button";
 import { login } from "../../services/mockApi";
 import "./LoginPage.css";
+
 import imgmulher from "../../assets/mulher-terapeuta.jpg";
+import logoMindUp from "../../assets/MindUp svg.svg";
 
 function LoginPage() {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const [loading, setLoading] = useState(False);
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -32,22 +34,72 @@ function LoginPage() {
     }
 
     return (
-        <main className="login-container">
-            <section className="login-section">
-                
-                <div className="login-content">
-                    <form action="" className="login-form">
-                        
+        <div className="login-page-container">
+
+            <div className="login-form-section">
+
+                <header className="login-header">
+                    <img src={logoMindUp} alt="MindUp Logo" className="login-logo-img"/>
+                    <div className="login-brand-text">
+                        <h1>MindUp</h1>
+                        <p>Seu espaço de Acolhimento</p>
+                    </div>
+                </header>
+
+                <div className="login-box">
+                    <h2>Conecte-se</h2>
+
+                    <form onSubmit={handleSubmit}>
+                        {error && <p className="error-message">error</p>}
+
+                        <Input
+                            type="email"
+                            placeholder="E-mail"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                            aria-label="E-mail"
+                        />
+
+                        <Input
+                            type="password"
+                            placeholder="Senha"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                            aria-label="Senha"
+                        />
+
+                        <div className="login-options">
+                            <label className="lembrar">
+                                <input type="checkbox"/> Lembre-se
+                            </label>
+                            <a href="/recuperar-senha">Recuperar Senha</a>
+                        </div>
+
+                        {/* <Button
+                            type="submit"
+                            className="btn-login-submit"
+                            disabled={loading}
+                        >
+                                {loading ? "Entrando..." : "Entrar"}
+                        </Button> */}
                     </form>
+
+                    {/* <div className="register-link">
+                        <p>
+                            Não possui uma conta?
+                            <Button to="/cadastro" className="btn-link">Resgistre-se</Button>
+                        </p>
+                    </div> */}
                 </div>
+            </div>
 
-                <div className="login-img-wrapper">
-                    <img src={imgmulher} alt="login-img-mulher" className="login-img"/>
-                </div>
-
-            </section>
-        </main>
-
+            {/* <div className="login-visual-section">
+                <div className="visual-blob"></div>
+                <img src={imgmulher} alt="Terapeuta MindUp" className="login-visual-img"/>
+            </div> */}
+        </div>
     );
 }
 
