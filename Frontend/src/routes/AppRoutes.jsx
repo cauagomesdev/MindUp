@@ -7,6 +7,7 @@ import HomePage from "../pages/HomePage/HomePage";
 import LoginPage from "../pages/LoginPage/LoginPage";
 import RegisterPage from "../pages/RegisterPage/RegisterPage";
 import AgendamentosPage from "../pages/AgendamentosPage/AgendamentosPage";
+import RecuperarPage from "../pages/RecuperarPage/RecuperarPage";
 
 function AppRoutes() {
     return (
@@ -19,6 +20,7 @@ function AppRoutes() {
                 <Route element={<Layout />}>
                     <Route path="/" element={<HomePage/>} />
                     <Route path="/agendamentos" element={<AgendamentosPage/>} />
+                    <Route path= "/recuperar-senha" element={<RecuperarPage/>} />
                 </Route>
         
                 <Route path="*" element={<h1>404 - Página Não Encontrada</h1>} />
