@@ -17,14 +17,14 @@ function Button({ children, onClick, to, type = "button", className = "", ...pro
         );
     }
     return (
-        <Button
+        <button
             type={type}
             onClick={onClick}
             className={baseClasses}
             {...props}
         >
             {children}
-        </Button>
+        </button>
     );
 }
 
