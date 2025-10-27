@@ -5,8 +5,8 @@ import Button from "../../components/Button/Button";
 import { login } from "../../services/mockApi";
 import "./LoginPage.css";
 
-import imgmulher from "../../assets/mulher-terapeuta.jpg";
-import logoMindUp from "../../assets/MindUp svg.svg";
+import imgmulher from "../../assets/mulher_terapeuta_login.png";
+import logoMindUp from "../../assets/MindUp Logo.png";
 
 function LoginPage() {
 
@@ -77,28 +77,28 @@ function LoginPage() {
                             <a href="/recuperar-senha">Recuperar Senha</a>
                         </div>
 
-                        {/* <Button
+                        <Button
                             type="submit"
                             className="btn-login-submit"
                             disabled={loading}
                         >
                                 {loading ? "Entrando..." : "Entrar"}
-                        </Button> */}
-                    </form>
+                        </Button> 
+                    </form> 
 
-                    {/* <div className="register-link">
+                     <div className="register-link">
                         <p>
                             Não possui uma conta?
                             <Button to="/cadastro" className="btn-link">Resgistre-se</Button>
                         </p>
-                    </div> */}
+                    </div> 
                 </div>
             </div>
 
-            {/* <div className="login-visual-section">
+            <div className="login-visual-section">
                 <div className="visual-blob"></div>
                 <img src={imgmulher} alt="Terapeuta MindUp" className="login-visual-img"/>
-            </div> */}
+            </div>
         </div>
     );
 }
