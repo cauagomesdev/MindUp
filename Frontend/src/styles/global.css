@@ -31,3 +31,37 @@
     background-color: #e0f2f1;
     transform: translateY(-2px);
 }
+
+.input-wrapper {
+    position: relative; 
+    width: 100%;
+}
+
+.password-toggle-icon {
+    position: absolute;
+    right: 18px; 
+    top: 50%; 
+    transform: translateY(-50%); 
+    cursor: pointer;
+    color: #999;
+    user-select: none; 
+}
+
+.password-toggle-icon:hover {
+    color: #333;
+}
+
+.login-box .input-field[type="password"],
+.login-box .input-field[type="text"] {
+    padding-right: 50px; 
+}
+
+.register-box .input-field[type="password"],
+.register-box .input-field[type="text"] {
+    padding-right: 50px;
+}
+
+.password-toggle-icon svg {
+    width: 20px;
+    height: 20px; 
+}
