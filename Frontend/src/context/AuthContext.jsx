@@ -20,7 +20,49 @@ export function AuthProvider({children}) {
     }, []);
 
     const login = async (email, password) => {
-        
-    }
+        const result = await apiLogin(email,password);
+        if (result.success) {
+            setUser(result.user);
+            navigate("/painel");
+            return result;
+        }
+        return result;
+    };
+
+    const register = async(name, email, password, role) => {
+        const result = await apiRegister(name, email, password, role);
+        if (result.success) {
+            setUser(result.user);
+            navigate("/painel");
+            return result;
+        }
+        return result;
+    };
+
+    const logout = () => {
+        setUser(null);
+        localStorage.removeItem("AuthToken");
+        localStorage.removeItem("currentUser");
+        navigate("/login");
+    };
+
+    const value = {
+        user,
+        loading,
+        login,
+        register,
+        logout,
+    };
+
+    return (
+        <AuthContext.Provider value={value}>
+            {!loading && children}
+        </AuthContext.Provider>
+    );
 }
+
+export function useAuth(){
+    return useContext(AuthContext);
+}
+
 
