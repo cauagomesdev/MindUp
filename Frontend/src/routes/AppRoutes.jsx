@@ -9,6 +9,8 @@ import RegisterPage from "../pages/RegisterPage/RegisterPage";
 import AgendamentosPage from "../pages/AgendamentosPage/AgendamentosPage";
 import RecuperarPage from "../pages/RecuperarPage/RecuperarPage";
 import PainelPage from "../pages/PainelPage/PainelPage";
+import SobreNosPage from "../pages/SobreNosPage/SobreNosPage";
+import SuportePage from "../pages/SuportePage/SuportePage";
 
 import ProtectedRoute from "../components/ProtectedRoute/ProtectedRoute";
 
@@ -19,9 +21,14 @@ function AppRoutes() {
                 <Route path="/login" element={<LoginPage/>} />
                 <Route path="/cadastro" element={<RegisterPage/>} />
 
-            <Route element={<ProtectedRoute />}>
                 <Route element={<Layout />}>
                     <Route path="/" element={<HomePage/>} />
+                    <Route path="/suporte" element={<SuportePage/>} />
+                    <Route path="/sobre-nos" element={<SobreNosPage/>} />
+                </Route>
+
+            <Route element={<ProtectedRoute />}>
+                <Route element={<Layout />}>
                     <Route path="/agendamentos" element={<AgendamentosPage/>} />
                     <Route path= "/recuperar-senha" element={<RecuperarPage/>} />
                     <Route path= "/painel" element={<PainelPage/>} />

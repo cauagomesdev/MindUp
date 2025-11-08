@@ -1,10 +1,13 @@
 import React from "react";
 import {Link} from "react-router-dom";
 import "./Header.css";
+import { useAuth } from "../../context/AuthContext";
 import logoMindUp from "../../assets/MindUp svg.svg";
 import Button from "../Button/Button";
 
 function Header() {
+  const {user, logout} = useAuth();
+
   return (
     <header className="header-container">
 
@@ -30,8 +33,20 @@ function Header() {
       </nav>
 
       <div className="header-auth-buttons">
+          {user ? (
+
+            <>
+              <span className="welcome-message">Olá, {user.email}! </span>
+              <Button onClick={logout} className="secondary">Sair</Button>
+            </>
+          ) : (
+
+            <>
           <Button to="/cadastro" className="secondary">Cadastre-se</Button>
           <Button to="/login" className="primary">Entrar</Button>
+            </>
+
+          )}
       </div>
 
     </header>
