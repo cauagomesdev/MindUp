@@ -27,7 +27,7 @@ function Header() {
       </div>
 
       <nav className="header-nav">    
-          <Link to="/sobre" className="header-nav-item">Sobre nós</Link>
+          <Link to="/sobre-nos" className="header-nav-item">Sobre nós</Link>
           <Link to="/suporte" className="header-nav-item">Suporte</Link>
           <Link to="/agendamentos" className="header-nav-item">Agendamentos</Link>
       </nav>
