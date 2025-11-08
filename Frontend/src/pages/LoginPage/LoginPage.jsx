@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Input from "../../components/Input/Input";
 import Button from "../../components/Button/Button";
-import { login } from "../../services/mockApi";
 import "./LoginPage.css";
+import { useAuth } from "../../context/AuthContext";
 
 import imgmulher from "../../assets/mulher_terapeuta_login.png";
 import logoMindUp from "../../assets/MindUp Logo.png";
@@ -14,7 +13,8 @@ function LoginPage() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
+
+    const { login } = useAuth();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -23,13 +23,11 @@ function LoginPage() {
 
         const result = await login(email, password);
 
-        if(result.success){
-            console.log("Login bem-sucedido", result.user);
-            navigate("/agendamentos");
-        }else{
+        if(!result.success){
             setError(result.message);
             console.error("Erro no login:", result.message);
         }
+        
         setLoading(false);
     }
 
@@ -50,7 +48,7 @@ function LoginPage() {
                     <h2>Conecte-se</h2>
 
                     <form onSubmit={handleSubmit}>
-                        {error && <p className="error-message">error</p>}
+                        {error && <p className="error-message">{error}</p>}
 
                         <Input
                             type="email"
