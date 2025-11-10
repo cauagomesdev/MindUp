@@ -1,5 +1,5 @@
 import React from 'react';
-import "./SobreNos.css";
+import "./SobreNosPage.css";
 import imgequipe from "../../assets/fotoequipe.jpeg";
 import imgsobre from "../../assets/img-sobre-nos.png";
 
