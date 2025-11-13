@@ -141,3 +141,68 @@ class CustomPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
     max_page_size = 100
+
+# Views para Espaço Comunitário
+@method_decorator(csrf_exempt, name='dispatch')
+class EspacoComunitarioListCreate(generics.ListCreateAPIView):
+    queryset = EspacoComunitario.objects.all().order_by('nome')
+    serializer_class = EspacoComunitarioSerializer
+
+    def list(self, request, *args, **kwargs):
+        serializer = self.get_serializer(self.get_queryset(), many=True)
+        return Response({"espacos": serializer.data})
+
+# Views para Acompanhamento
+@method_decorator(csrf_exempt, name='dispatch')
+class AcompanhamentoListCreate(generics.ListCreateAPIView):
+    queryset = Acompanhamento.objects.all().order_by('-data_inicio')
+    serializer_class = AcompanhamentoSerializer
+
+    def list(self, request, *args, **kwargs):
+        serializer = self.get_serializer(self.get_queryset(), many=True)
+        return Response({"acompanhamentos": serializer.data})
+
+@method_decorator(csrf_exempt, name='dispatch')
+class AcompanhamentoDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Acompanhamento.objects.all()
+    serializer_class = AcompanhamentoSerializer
+    lookup_field = 'id_acompanhamento'
+    lookup_url_kwarg = 'id'
+
+# Views para Atendimento Detail (update/delete)
+@method_decorator(csrf_exempt, name='dispatch')
+class AtendimentoDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Atendimento.objects.all()
+    serializer_class = AtendimentoSerializer
+    lookup_field = 'id_atendimento'
+    lookup_url_kwarg = 'id'
+
+# Views para Colaborador
+@method_decorator(csrf_exempt, name='dispatch')
+class ColaboradorListCreate(generics.ListCreateAPIView):
+    queryset = Colaborador.objects.all().order_by('nome')
+    serializer_class = ColaboradorSerializer
+
+    def list(self, request, *args, **kwargs):
+        serializer = self.get_serializer(self.get_queryset(), many=True)
+        return Response({"colaboradores": serializer.data})
+
+# Views para Voluntário
+@method_decorator(csrf_exempt, name='dispatch')
+class VoluntarioListCreate(generics.ListCreateAPIView):
+    queryset = Voluntario.objects.all().order_by('nome')
+    serializer_class = VoluntarioSerializer
+
+    def list(self, request, *args, **kwargs):
+        serializer = self.get_serializer(self.get_queryset(), many=True)
+        return Response({"voluntarios": serializer.data})
+
+# Views para Disponibilidade
+@method_decorator(csrf_exempt, name='dispatch')
+class DisponibilidadeListCreate(generics.ListCreateAPIView):
+    queryset = Disponibilidade.objects.all().order_by('dia_semana', 'hora_inicio')
+    serializer_class = DisponibilidadeSerializer
+
+    def list(self, request, *args, **kwargs):
+        serializer = self.get_serializer(self.get_queryset(), many=True)
+        return Response({"disponibilidades": serializer.data})

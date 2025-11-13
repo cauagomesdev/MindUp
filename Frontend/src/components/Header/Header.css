@@ -1,0 +1,120 @@
+.header-container {
+    width: 100%;
+    padding: 10px 40px;
+    background-color: white;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+    height: 80px;
+}
+
+.header-brand {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header-logo-link {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+.header-logo-image {
+    height: 80px;
+}
+
+.header-texts {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.header-title {
+    font-size: 1.5rem;
+    margin: 0;
+    color: #333;
+    font-weight: bold;
+}
+
+.header-tagline {
+    font-size: 0.85rem;
+    margin: 0;
+    color: #666;
+    margin-top: 4px;
+    border-bottom: 1px solid #666;
+    padding-bottom: 3px;
+}
+
+.header-nav {
+    display: flex;
+    gap: 25px;
+    margin-left: auto;
+    margin-right: 40px;
+}
+
+.header-nav-item {
+    text-decoration: none;
+    color: #00796b;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: color 0.3s ease;
+}
+
+
+.header-nav-item:hover {
+    color: #004d40;
+}
+
+.header-auth-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+@media (max-width: 900px) {
+    .header-nav {
+        gap: 15px; 
+        margin-right: 20px;
+    }
+    .header-auth-buttons {
+        gap: 10px; 
+    }
+    .header-container {
+        padding: 10px 20px;
+        height: 70px;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-container {
+        flex-wrap: wrap; 
+        justify-content: center; 
+        height: auto; 
+        padding: 15px 10px;
+    }
+
+    .header-brand {
+        width: 100%; 
+        justify-content: center; 
+        margin-bottom: 15px;
+    }
+
+    .header-nav, .header-auth-buttons {
+        width: 100%;
+        justify-content: center;
+        margin: 0;
+        margin-bottom: 10px;
+        gap: 10px; 
+    }
+
+    .header-auth-buttons {
+        flex-direction: column; 
+        max-width: 250px;
+    }
+
+    .btn {
+        width: 100%;
+    }
+}
