@@ -1,18 +1,40 @@
+# core/urls.py
+
 from django.urls import path
 from .views import (
-    PacienteListCreate, ComunidadeListCreate, AtendimentoListCreate,
-    LoginUsuario, UsuarioListCreate, EspacoComunitarioListCreate,
-    AcompanhamentoListCreate, AcompanhamentoDetail, AtendimentoDetail,
-    ColaboradorListCreate, VoluntarioListCreate, DisponibilidadeListCreate
+    # --- CORREÇÃO AQUI ---
+    # Importe os nomes novos (List), não os antigos (ListCreate)
+    PacienteList, 
+    VoluntarioList, 
+    UsuarioList,
+    # --- O resto dos imports ---
+    ComunidadeListCreate, 
+    AtendimentoListCreate,
+    LoginUsuario, 
+    RegisterUsuario, # A nova view de registro
+    EspacoComunitarioListCreate,
+    AcompanhamentoListCreate, 
+    AcompanhamentoDetail, 
+    AtendimentoDetail,
+    ColaboradorListCreate, 
+    DisponibilidadeListCreate
+)
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
 )
 
 urlpatterns = [
     # Autenticação
     path('auth/login/', LoginUsuario.as_view(), name='login_usuario'),
+    path('auth/register/', RegisterUsuario.as_view(), name='register_usuario'),
+    path('auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     
     # Pacientes
-    path('pacientes/listar', PacienteListCreate.as_view(), name='listar_pacientes'),
-    path('pacientes/', PacienteListCreate.as_view(), name='cadastrar_paciente'),
+    # --- CORREÇÃO AQUI ---
+    path('pacientes/listar', PacienteList.as_view(), name='listar_pacientes'),
+    # A rota 'pacientes/' de cadastro foi removida (agora é 'auth/register/')
     
     # Comunidades
     path('comunidades/', ComunidadeListCreate.as_view(), name='listar_criar_comunidades'),
@@ -26,7 +48,8 @@ urlpatterns = [
     path('acompanhamentos/<uuid:id>/', AcompanhamentoDetail.as_view(), name='acompanhamento_detail'),
     
     # Usuários (Profissionais)
-    path('usuarios/', UsuarioListCreate.as_view(), name='listar_criar_usuarios'),
+    # --- CORREÇÃO AQUI ---
+    path('usuarios/', UsuarioList.as_view(), name='listar_usuarios'),
     
     # Espaços Comunitários
     path('espacos/', EspacoComunitarioListCreate.as_view(), name='listar_criar_espacos'),
@@ -35,7 +58,8 @@ urlpatterns = [
     path('colaboradores/', ColaboradorListCreate.as_view(), name='listar_criar_colaboradores'),
     
     # Voluntários
-    path('voluntarios/', VoluntarioListCreate.as_view(), name='listar_criar_voluntarios'),
+    # --- CORREÇÃO AQUI ---
+    path('voluntarios/', VoluntarioList.as_view(), name='listar_voluntarios'),
     
     # Disponibilidades
     path('disponibilidades/', DisponibilidadeListCreate.as_view(), name='listar_criar_disponibilidades'),
