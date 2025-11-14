@@ -1,208 +1,166 @@
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.contrib.auth.hashers import make_password, check_password
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
-from .models import *
-from .serializers import *
-
-# Em views.py - Log de erros
-import logging
-logger = logging.getLogger(__name__)
-
-# Views para Paciente (mantendo compatibilidade com frontend)
-@method_decorator(csrf_exempt, name='dispatch')
-class PacienteListCreate(generics.ListCreateAPIView):
-    queryset = Paciente.objects.all().order_by('nome')
-    serializer_class = PacienteSerializer
-
-    def list(self, request, *args, **kwargs):
-        serializer = self.get_serializer(self.get_queryset(), many=True)
-        return Response({"pacientes": serializer.data})
-
-    def create(self, request, *args, **kwargs):
-        data = request.data.copy()
-        senha = data.pop('senha', None)
-        if not senha:
-            return Response({"error": "Senha é obrigatória."}, status=status.HTTP_400_BAD_REQUEST)
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        Paciente.objects.create(
-            nome=serializer.validated_data['nome'],
-            email=serializer.validated_data['email'],
-            senha_hash=make_password(senha),
-            endereco=serializer.validated_data.get('endereco', ''),
-            id_comunidade=serializer.validated_data.get('id_comunidade'),
-        )
-        return Response({"message": "Paciente cadastrado com sucesso!"}, status=status.HTTP_201_CREATED)
-
-# Views para Comunidade
-@method_decorator(csrf_exempt, name='dispatch')
-class ComunidadeListCreate(generics.ListCreateAPIView):
-    queryset = Comunidade.objects.all().order_by('nome')
-    serializer_class = ComunidadeSerializer
-
-    def list(self, request, *args, **kwargs):
-        serializer = self.get_serializer(self.get_queryset(), many=True)
-        return Response({"comunidades": serializer.data})
-
-# Views para Atendimento
-@method_decorator(csrf_exempt, name='dispatch')
-class AtendimentoListCreate(generics.ListCreateAPIView):
-    queryset = Atendimento.objects.all().order_by('-data', '-horario')
-    serializer_class = AtendimentoSerializer
-
-    def list(self, request, *args, **kwargs):
-        serializer = self.get_serializer(self.get_queryset(), many=True)
-        return Response({"atendimentos": serializer.data})
-
-# Login usando nova tabela Usuario
-@method_decorator(csrf_exempt, name='dispatch')
-class LoginUsuario(APIView):
-    def post(self, request):
-        nome_login = request.data.get('nome_login') or request.data.get('email')
-        senha = request.data.get('senha')
-        
-        if not nome_login or not senha:
-            return Response({"error": "Login e senha são obrigatórios."}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Primeiro tentar na tabela Usuario
-        try:
-            usuario = Usuario.objects.get(nome_login=nome_login)
-            if check_password(senha, usuario.senha_hash):
-                return Response({
-                    "message": "Login realizado com sucesso!",
-                    "id": str(usuario.id_usuario),
-                    "nome": usuario.nome_login,
-                    "nivel_acesso": usuario.nivel_acesso
-                }, status=status.HTTP_200_OK)
-        except Usuario.DoesNotExist:
-            pass
-        
-        # Se não encontrou, tentar por email na tabela Usuario
-        try:
-            usuario = Usuario.objects.get(email=nome_login)
-            if check_password(senha, usuario.senha_hash):
-                return Response({
-                    "message": "Login realizado com sucesso!",
-                    "id": str(usuario.id_usuario),
-                    "nome": usuario.nome_login,
-                    "nivel_acesso": usuario.nivel_acesso
-                }, status=status.HTTP_200_OK)
-        except Usuario.DoesNotExist:
-            pass
-        
-        # Se não encontrou na tabela Usuario, tentar na tabela Paciente
-        try:
-            paciente = Paciente.objects.get(email=nome_login)
-            if check_password(senha, paciente.senha_hash):
-                return Response({
-                    "message": "Login realizado com sucesso!",
-                    "id": str(paciente.id_paciente),
-                    "nome": paciente.nome,
-                    "nivel_acesso": "paciente"
-                }, status=status.HTTP_200_OK)
-        except Paciente.DoesNotExist:
-            pass
-        
-        return Response({"error": "Usuário ou senha inválidos"}, status=status.HTTP_401_UNAUTHORIZED)
-    
-# Views para Usuario
-@method_decorator(csrf_exempt, name='dispatch')
-class UsuarioListCreate(generics.ListCreateAPIView):
-    queryset = Usuario.objects.all().order_by('nome_login')
-    serializer_class = UsuarioSerializer
-
-    def list(self, request, *args, **kwargs):
-        serializer = self.get_serializer(self.get_queryset(), many=True)
-        return Response(serializer.data)  # Retorna lista direta para ProfissionaisList
-
-    def create(self, request, *args, **kwargs):
-        data = request.data.copy()
-        senha = data.pop('senha', None)
-        if not senha:
-            return Response({"error": "Senha é obrigatória."}, status=status.HTTP_400_BAD_REQUEST)
-        
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        Usuario.objects.create(
-            nome_login=serializer.validated_data['nome_login'],
-            email=serializer.validated_data['email'],
-            senha_hash=make_password(senha),
-            nivel_acesso=serializer.validated_data.get('nivel_acesso', 'colaborador'),
-        )
-        return Response({"message": "Usuário cadastrado com sucesso!"}, status=status.HTTP_201_CREATED)
-
-# Em views.py
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework_simplejwt.tokens import RefreshToken
+from .models import (
+    Comunidade, EspacoComunitario, Paciente, Colaborador,
+    Disponibilidade, Voluntario, Usuario, Atendimento,
+    Participar, Acompanhamento
+)
+from .serializers import (
+    UsuarioRegisterSerializer, LoginSerializer, UsuarioSerializer,
+    PacienteSerializer, VoluntarioSerializer, ComunidadeSerializer,
+    EspacoComunitarioSerializer, ColaboradorSerializer, DisponibilidadeSerializer,
+    AtendimentoSerializer, ParticiparSerializer, AcompanhamentoSerializer
+)
 from rest_framework.pagination import PageNumberPagination
+
+# ===================================================================
+# 1. AUTENTICAÇÃO E REGISTRO
+# ===================================================================
+
+class LoginUsuario(APIView):
+    """
+    View para login de usuários.
+    Recebe 'email' e 'password', retorna dados do usuário e token JWT.
+    """
+    permission_classes = [AllowAny] # Qualquer um pode tentar logar
+
+    def post(self, request):
+        # Passa o 'request' para o contexto do serializer (necessário para o 'authenticate')
+        serializer = LoginSerializer(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        
+        user = serializer.validated_data['user'] # type: ignore
+        
+        # Gera os tokens JWT
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+        
+        # Serializa os dados do usuário para retornar no login
+        user_data = UsuarioSerializer(user).data
+        
+        return Response({
+            "message": "Login realizado com sucesso!",
+            "user": user_data,
+            "token": access_token
+        }, status=status.HTTP_200_OK)
+
+class RegisterUsuario(generics.CreateAPIView):
+    """
+    View para registro de *novos usuários*.
+    Usa o UsuarioRegisterSerializer que lida com a criação
+    do Usuário e do perfil (Paciente ou Voluntário) de forma atômica.
+    """
+    permission_classes = [AllowAny] # Qualquer um pode se registrar
+    serializer_class = UsuarioRegisterSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save() # Chama o método create() do serializer
+        
+        # Loga o usuário automaticamente após o registro
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+        
+        user_data = UsuarioSerializer(user).data
+        
+        headers = self.get_success_headers(serializer.data)
+        
+        return Response({
+            "message": "Usuário cadastrado com sucesso!",
+            "user": user_data,
+            "token": access_token
+        }, status=status.HTTP_201_CREATED, headers=headers)
+
+# ===================================================================
+# 2. PAGINAÇÃO (Opcional, mas bom para performance)
+# ===================================================================
 
 class CustomPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
     max_page_size = 100
 
+# ===================================================================
+# 3. VIEWS DE DADOS (CRUD)
+# ===================================================================
+
+# Views para Paciente (Agora apenas Leitura, pois o registro é centralizado)
+class PacienteList(generics.ListAPIView):
+    queryset = Paciente.objects.all().order_by('usuario__nome')
+    serializer_class = PacienteSerializer
+    permission_classes = [IsAuthenticated] # Apenas logados podem ver
+    pagination_class = CustomPagination
+
+# Views para Voluntário (Agora apenas Leitura)
+class VoluntarioList(generics.ListAPIView):
+    queryset = Voluntario.objects.all().order_by('usuario__nome')
+    serializer_class = VoluntarioSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = CustomPagination
+
+# Views para Comunidade
+class ComunidadeListCreate(generics.ListCreateAPIView):
+    queryset = Comunidade.objects.all().order_by('nome')
+    serializer_class = ComunidadeSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly] # Todos podem ver, só logados podem criar
+    pagination_class = CustomPagination
+
 # Views para Espaço Comunitário
-@method_decorator(csrf_exempt, name='dispatch')
 class EspacoComunitarioListCreate(generics.ListCreateAPIView):
     queryset = EspacoComunitario.objects.all().order_by('nome')
     serializer_class = EspacoComunitarioSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    pagination_class = CustomPagination
 
-    def list(self, request, *args, **kwargs):
-        serializer = self.get_serializer(self.get_queryset(), many=True)
-        return Response({"espacos": serializer.data})
+# Views para Atendimento
+class AtendimentoListCreate(generics.ListCreateAPIView):
+    queryset = Atendimento.objects.all().order_by('-data', '-horario')
+    serializer_class = AtendimentoSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = CustomPagination
 
-# Views para Acompanhamento
-@method_decorator(csrf_exempt, name='dispatch')
-class AcompanhamentoListCreate(generics.ListCreateAPIView):
-    queryset = Acompanhamento.objects.all().order_by('-data_inicio')
-    serializer_class = AcompanhamentoSerializer
-
-    def list(self, request, *args, **kwargs):
-        serializer = self.get_serializer(self.get_queryset(), many=True)
-        return Response({"acompanhamentos": serializer.data})
-
-@method_decorator(csrf_exempt, name='dispatch')
-class AcompanhamentoDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Acompanhamento.objects.all()
-    serializer_class = AcompanhamentoSerializer
-    lookup_field = 'id_acompanhamento'
-    lookup_url_kwarg = 'id'
-
-# Views para Atendimento Detail (update/delete)
-@method_decorator(csrf_exempt, name='dispatch')
 class AtendimentoDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Atendimento.objects.all()
     serializer_class = AtendimentoSerializer
+    permission_classes = [IsAuthenticated]
     lookup_field = 'id_atendimento'
     lookup_url_kwarg = 'id'
 
+# Views para Acompanhamento
+class AcompanhamentoListCreate(generics.ListCreateAPIView):
+    queryset = Acompanhamento.objects.all().order_by('-data_inicio')
+    serializer_class = AcompanhamentoSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = CustomPagination
+
+class AcompanhamentoDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Acompanhamento.objects.all()
+    serializer_class = AcompanhamentoSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = 'id_acompanhamento'
+    lookup_url_kwarg = 'id'
+
 # Views para Colaborador
-@method_decorator(csrf_exempt, name='dispatch')
 class ColaboradorListCreate(generics.ListCreateAPIView):
     queryset = Colaborador.objects.all().order_by('nome')
     serializer_class = ColaboradorSerializer
-
-    def list(self, request, *args, **kwargs):
-        serializer = self.get_serializer(self.get_queryset(), many=True)
-        return Response({"colaboradores": serializer.data})
-
-# Views para Voluntário
-@method_decorator(csrf_exempt, name='dispatch')
-class VoluntarioListCreate(generics.ListCreateAPIView):
-    queryset = Voluntario.objects.all().order_by('nome')
-    serializer_class = VoluntarioSerializer
-
-    def list(self, request, *args, **kwargs):
-        serializer = self.get_serializer(self.get_queryset(), many=True)
-        return Response({"voluntarios": serializer.data})
+    permission_classes = [IsAuthenticated] # Geralmente só admin/logados veem
+    pagination_class = CustomPagination
 
 # Views para Disponibilidade
-@method_decorator(csrf_exempt, name='dispatch')
 class DisponibilidadeListCreate(generics.ListCreateAPIView):
     queryset = Disponibilidade.objects.all().order_by('dia_semana', 'hora_inicio')
     serializer_class = DisponibilidadeSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = CustomPagination
 
-    def list(self, request, *args, **kwargs):
-        serializer = self.get_serializer(self.get_queryset(), many=True)
-        return Response({"disponibilidades": serializer.data})
+# Views para Usuario (Listar usuários existentes - geralmente para Admins)
+class UsuarioList(generics.ListAPIView):
+    queryset = Usuario.objects.all().order_by('nome')
+    serializer_class = UsuarioSerializer
+    permission_classes = [IsAuthenticated] # Idealmente [IsAdminUser]
+    pagination_class = CustomPagination

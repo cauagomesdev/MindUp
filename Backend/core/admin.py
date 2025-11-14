@@ -1,20 +1,76 @@
 from django.contrib import admin
-from django import forms
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.admin import UserAdmin
 from .models import (
     Comunidade, EspacoComunitario, Paciente, Colaborador,
     Disponibilidade, Voluntario, Usuario, Atendimento,
     Participar, Acompanhamento
 )
 
-# Admin para Comunidade
+# --- INLINES: Para editar Paciente/Voluntário dentro do Usuário ---
+
+# Isso permite que, ao editar um Usuário, você veja/edite o perfil
+# de Paciente associado a ele na mesma tela.
+class PacienteInline(admin.StackedInline):
+    model = Paciente
+    can_delete = False # Não permitir deletar o perfil sem deletar o usuário
+    verbose_name_plural = 'Perfil de Paciente'
+    fk_name = 'usuario' # Especifica a chave estrangeira usada
+
+# O mesmo para Voluntário
+class VoluntarioInline(admin.StackedInline):
+    model = Voluntario
+    can_delete = False
+    verbose_name_plural = 'Perfil de Voluntário'
+    fk_name = 'usuario'
+
+# --- Admin para o Modelo USUÁRIO (Corrigido) ---
+
+@admin.register(Usuario)
+class UsuarioAdmin(UserAdmin):
+    # Campos que aparecem na lista de usuários
+    list_display = ('email', 'nome', 'nivel_acesso', 'is_staff', 'is_active', 'criado_em')
+    list_filter = ('nivel_acesso', 'is_staff', 'is_active', 'criado_em')
+    search_fields = ('email', 'nome')
+    ordering = ('email',)
+    
+    # Campos que aparecem ao *editar* um usuário
+    # (Sobrescrevendo o UserAdmin padrão para usar nossos campos customizados)
+    fieldsets = (
+        (None, {'fields': ('email', 'password')}), # O 'password' será tratado pelo UserAdmin
+        ('Informações Pessoais', {'fields': ('nome', 'nivel_acesso')}),
+        ('Permissões', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
+        ('Datas Importantes', {'fields': ('last_login', 'criado_em')}),
+    )
+    
+    # Campos que aparecem ao *adicionar* um usuário (no /admin/)
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('nome', 'email', 'password', 'password2', 'nivel_acesso', 'is_staff', 'is_superuser'),
+        }),
+    )
+    
+    # Campos que não podem ser editados
+    readonly_fields = ('last_login', 'criado_em')
+    
+    # Adiciona os perfis de Paciente e Voluntário na mesma página
+    inlines = (PacienteInline, VoluntarioInline)
+    
+    # Necessário para o AbstractBaseUser
+    filter_horizontal = ('groups', 'user_permissions',)
+
+    # Sobrescreve para usar o modelo customizado
+    model = Usuario
+    
+
+# --- Admins Simples (Comunidade, Espaco, Colaborador) ---
+
 @admin.register(Comunidade)
 class ComunidadeAdmin(admin.ModelAdmin):
     list_display = ('nome', 'localizacao', 'descricao')
     search_fields = ('nome', 'localizacao')
     ordering = ('nome',)
 
-# Admin para EspacoComunitario
 @admin.register(EspacoComunitario)
 class EspacoComunitarioAdmin(admin.ModelAdmin):
     list_display = ('nome', 'endereco', 'capacidade', 'responsavel', 'id_comunidade')
@@ -22,46 +78,6 @@ class EspacoComunitarioAdmin(admin.ModelAdmin):
     search_fields = ('nome', 'endereco', 'responsavel')
     ordering = ('nome',)
 
-# Form customizado para Paciente
-class PacienteAdminForm(forms.ModelForm):
-    senha = forms.CharField(
-        required=False, 
-        widget=forms.PasswordInput, 
-        help_text="Deixe em branco para manter a senha atual. Digite uma nova senha para alterá-la."
-    )
-    
-    class Meta:
-        model = Paciente
-        fields = ('nome', 'email', 'endereco', 'id_comunidade', 'senha')
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Se está editando um objeto existente, não tornar a senha obrigatória
-        if self.instance and self.instance.pk:
-            self.fields['senha'].required = False
-        else:
-            self.fields['senha'].required = True
-            self.fields['senha'].help_text = "Senha obrigatória para novos pacientes."
-
-    def save(self, commit=True):
-        obj = super().save(commit=False)
-        senha = self.cleaned_data.get('senha')
-        if senha:  # Só atualiza se uma nova senha foi fornecida
-            obj.senha_hash = make_password(senha)
-        if commit:
-            obj.save()
-        return obj
-
-@admin.register(Paciente)
-class PacienteAdmin(admin.ModelAdmin):
-    form = PacienteAdminForm
-    list_display = ('nome', 'email', 'endereco', 'id_comunidade', 'criado_em')
-    list_filter = ('id_comunidade', 'criado_em')
-    search_fields = ('nome', 'email')
-    ordering = ('nome',)
-    readonly_fields = ('criado_em',)
-
-# Admin para Colaborador
 @admin.register(Colaborador)
 class ColaboradorAdmin(admin.ModelAdmin):
     list_display = ('nome', 'cpf', 'endereco', 'contato', 'criado_em')
@@ -69,82 +85,45 @@ class ColaboradorAdmin(admin.ModelAdmin):
     ordering = ('nome',)
     readonly_fields = ('criado_em',)
 
-# Admin para Disponibilidade
+# --- Admin para Disponibilidade (Corrigido) ---
 @admin.register(Disponibilidade)
 class DisponibilidadeAdmin(admin.ModelAdmin):
-    list_display = ('id_colaborador', 'dia_semana', 'hora_inicio', 'hora_fim')
-    list_filter = ('dia_semana', 'id_colaborador')
-    ordering = ('id_colaborador', 'dia_semana', 'hora_inicio')
+    # CORREÇÃO: Mostra 'id_voluntario'
+    list_display = ('id_voluntario', 'dia_semana', 'hora_inicio', 'hora_fim')
+    list_filter = ('dia_semana', 'id_voluntario')
+    ordering = ('id_voluntario', 'dia_semana', 'hora_inicio')
 
-# Admin para Voluntario
-@admin.register(Voluntario)
-class VoluntarioAdmin(admin.ModelAdmin):
-    list_display = ('nome', 'contato', 'universidade', 'especialidade', 'id_colaborador')
-    list_filter = ('especialidade', 'universidade')
-    search_fields = ('nome', 'contato', 'especialidade')
-    ordering = ('nome',)
-
-# Form customizado para Usuario
-class UsuarioAdminForm(forms.ModelForm):
-    senha = forms.CharField(
-        required=False, 
-        widget=forms.PasswordInput, 
-        help_text="Deixe em branco para manter a senha atual. Digite uma nova senha para alterá-la."
-    )
-    
-    class Meta:
-        model = Usuario
-        fields = ('nome_login', 'email', 'nivel_acesso', 'senha')
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Se está editando um objeto existente, não tornar a senha obrigatória
-        if self.instance and self.instance.pk:
-            self.fields['senha'].required = False
-        else:
-            self.fields['senha'].required = True
-            self.fields['senha'].help_text = "Senha obrigatória para novos usuários."
-
-    def save(self, commit=True):
-        obj = super().save(commit=False)
-        senha = self.cleaned_data.get('senha')
-        if senha:  # Só atualiza se uma nova senha foi fornecida
-            obj.senha_hash = make_password(senha)
-        if commit:
-            obj.save()
-        return obj
-
-@admin.register(Usuario)
-class UsuarioAdmin(admin.ModelAdmin):
-    form = UsuarioAdminForm
-    list_display = ('nome_login', 'email', 'nivel_acesso', 'criado_em')
-    list_filter = ('nivel_acesso', 'criado_em')
-    search_fields = ('nome_login', 'email')
-    ordering = ('nome_login',)
-    readonly_fields = ('criado_em',)
-
-# Admin para Atendimento
+# --- Admin para Atendimento (Corrigido) ---
 @admin.register(Atendimento)
 class AtendimentoAdmin(admin.ModelAdmin):
     list_display = ('id_paciente', 'data', 'horario', 'tipo_atendimento', 'status', 'id_espaco_comunitario')
     list_filter = ('status', 'data', 'tipo_atendimento')
-    search_fields = ('id_paciente__nome', 'tipo_atendimento')
+    # CORREÇÃO: O caminho da busca agora é 'id_paciente__usuario__nome'
+    search_fields = ('id_paciente__usuario__nome', 'tipo_atendimento')
     ordering = ('-data', '-horario')
     date_hierarchy = 'data'
     readonly_fields = ('criado_em',)
 
-# Admin para Participar
+# --- Admin para Participar (Corrigido) ---
 @admin.register(Participar)
 class ParticiparAdmin(admin.ModelAdmin):
     list_display = ('id_paciente', 'id_atendimento')
-    search_fields = ('id_paciente__nome', 'id_atendimento__tipo_atendimento')
+    # CORREÇÃO: O caminho da busca
+    search_fields = ('id_paciente__usuario__nome', 'id_atendimento__tipo_atendimento')
 
-# Admin para Acompanhamento
+# --- Admin para Acompanhamento (Corrigido) ---
 @admin.register(Acompanhamento)
 class AcompanhamentoAdmin(admin.ModelAdmin):
     list_display = ('id_paciente', 'data_inicio', 'situacao', 'criado_em')
     list_filter = ('situacao', 'data_inicio')
-    search_fields = ('id_paciente__nome', 'situacao')
+    # CORREÇÃO: O caminho da busca
+    search_fields = ('id_paciente__usuario__nome', 'situacao')
     ordering = ('-data_inicio',)
     date_hierarchy = 'data_inicio'
     readonly_fields = ('criado_em',)
+
+# --- REMOVIDO ---
+# Não precisamos mais registrar Paciente e Voluntario separadamente,
+# pois eles agora são 'inlines' do UsuarioAdmin.
+# @admin.register(Paciente) ...
+# @admin.register(Voluntario) ...
