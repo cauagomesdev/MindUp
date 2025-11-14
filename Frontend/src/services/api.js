@@ -1,9 +1,6 @@
-// src/services/api.js
-// Serviço para comunicação com o backend Django
-
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
-// Função auxiliar para fazer requisições HTTP
+
 async function fetchAPI(endpoint, options = {}) {
   const url = `${API_BASE_URL}${endpoint}`;
   
@@ -51,61 +48,36 @@ async function fetchAPI(endpoint, options = {}) {
   }
 }
 
-// === AUTENTICAÇÃO ===
-
 export async function login(email, password) {
   const result = await fetchAPI('/auth/login/', {
     method: 'POST',
     body: JSON.stringify({
-      nome_login: email,
+      email: email,
       senha: password,
     }),
   });
 
   if (result.success) {
     const { data } = result;
-    const token = `token-${data.id}`; // Token simplificado
+    const token = data.token; 
+    const user = data.user;
+
+    if (!token || !user) {
+      return { sucess: false, message: "Resposta de login inválida do servidor."};
+    }
+
     localStorage.setItem('authToken', token);
-    localStorage.setItem('currentUser', JSON.stringify({
-      id: data.id,
-      nome: data.nome,
-      email: email,
-      nivel_acesso: data.nivel_acesso,
-    }));
+    localStorage.setItem('currentUser', JSON.stringify(user));
     
     return {
       success: true,
-      user: {
-        id: data.id,
-        nome: data.nome,
-        email: email,
-        nivel_acesso: data.nivel_acesso,
-      },
+      user: user,
     };
   }
 
   return result;
 }
 
-export async function register(nome, email, password, endereco = '', id_comunidade = null) {
-  const result = await fetchAPI('/pacientes/', {
-    method: 'POST',
-    body: JSON.stringify({
-      nome,
-      email,
-      senha: password,
-      endereco,
-      id_comunidade,
-    }),
-  });
-
-  if (result.success) {
-    // Após cadastro bem-sucedido, fazer login automaticamente
-    return await login(email, password);
-  }
-
-  return result;
-}
 
 export async function logout() {
   localStorage.removeItem('authToken');
@@ -113,7 +85,6 @@ export async function logout() {
   return { success: true };
 }
 
-// === PACIENTES ===
 
 export async function getPacientes() {
   return await fetchAPI('/pacientes/listar', {
@@ -128,7 +99,6 @@ export async function createPaciente(pacienteData) {
   });
 }
 
-// === COMUNIDADES ===
 
 export async function getComunidades() {
   return await fetchAPI('/comunidades/', {
@@ -143,7 +113,6 @@ export async function createComunidade(comunidadeData) {
   });
 }
 
-// === ATENDIMENTOS ===
 
 export async function getAtendimentos() {
   return await fetchAPI('/atendimentos/', {
@@ -171,7 +140,6 @@ export async function deleteAtendimento(id) {
   });
 }
 
-// === ACOMPANHAMENTOS ===
 
 export async function getAcompanhamentos() {
   return await fetchAPI('/acompanhamentos/', {
@@ -193,7 +161,6 @@ export async function updateAcompanhamento(id, acompanhamentoData) {
   });
 }
 
-// === USUÁRIOS (PROFISSIONAIS) ===
 
 export async function getUsuarios() {
   return await fetchAPI('/usuarios/', {
@@ -208,7 +175,6 @@ export async function createUsuario(usuarioData) {
   });
 }
 
-// === ESPAÇOS COMUNITÁRIOS ===
 
 export async function getEspacosComunitarios() {
   return await fetchAPI('/espacos/', {
@@ -223,7 +189,6 @@ export async function createEspacoComunitario(espacoData) {
   });
 }
 
-// === COLABORADORES ===
 
 export async function getColaboradores() {
   return await fetchAPI('/colaboradores/', {
@@ -238,7 +203,6 @@ export async function createColaborador(colaboradorData) {
   });
 }
 
-// === VOLUNTÁRIOS ===
 
 export async function getVoluntarios() {
   return await fetchAPI('/voluntarios/', {
@@ -253,7 +217,6 @@ export async function createVoluntario(voluntarioData) {
   });
 }
 
-// === DISPONIBILIDADES ===
 
 export async function getDisponibilidades() {
   return await fetchAPI('/disponibilidades/', {
