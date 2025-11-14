@@ -1,25 +1,25 @@
 from django.core.management.base import BaseCommand
-from django.contrib.auth.hashers import make_password
 from core.models import Usuario
 
 class Command(BaseCommand):
-    help = 'Cria usuário admin inicial'
+    help = 'Cria usuário admin inicial para a MindUp'
 
     def handle(self, *args, **options):
-        try:
-            admin_user = Usuario.objects.get(nome_login='admin')
-            self.stdout.write(
-                self.style.WARNING('Usuário admin já existe.')
-            )
-        except Usuario.DoesNotExist:
-            Usuario.objects.create(
-                nome_login='admin',
+        # Verifica se o admin já existe (pelo email)
+        if not Usuario.objects.filter(email='admin@mindup.com').exists():
+            # Use o 'create_superuser' que você definiu no CustomUserManager
+            Usuario.objects.create_superuser( # type: ignore
                 email='admin@mindup.com',
-                senha_hash=make_password('admin123'),
-                nivel_acesso='admin'
+                nome='Admin MindUp', # Fornece o campo 'nome' obrigatório
+                password='admin123'
+                # 'nivel_acesso' já é definido como 'admin' pelo create_superuser
             )
             self.stdout.write(
                 self.style.SUCCESS('Usuário admin criado com sucesso!')
             )
-            self.stdout.write('Login: admin')
+            self.stdout.write('Email: admin@mindup.com')
             self.stdout.write('Senha: admin123')
+        else:
+            self.stdout.write(
+                self.style.WARNING('Usuário admin (admin@mindup.com) já existe.')
+            )
