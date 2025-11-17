@@ -24,7 +24,7 @@ function Home() {
 
         <div className='home-buttons'>
           <Button to="/agendamentos" className="primary">Agendar Consulta</Button>
-          <Button to="/evolucao" className="secondary">Acompanhar Evolução</Button>
+          <Button to="/acompanhamento" className="secondary">Acompanhar Evolução</Button>
         </div>
       </div>
 

@@ -11,7 +11,7 @@ import RecuperarPage from "../pages/RecuperarPage/RecuperarPage";
 import PainelPage from "../pages/PainelPage/PainelPage";
 import SobreNosPage from "../pages/SobreNosPage/SobreNosPage";
 import SuportePage from "../pages/SuportePage/SuportePage";
-import EvolucaoPage from "../pages/EvolucaoPage/EvolucaoPage";
+import AcompanhamentoPage from "../pages/AcompanhamentoPage/AcompanhamentoPage";
 
 import ProtectedRoute from "../components/ProtectedRoute/ProtectedRoute";
 
@@ -33,7 +33,7 @@ function AppRoutes() {
                 <Route element={<Layout />}>
                     <Route path="/agendamentos" element={<AgendamentosPage/>} />
                     <Route path= "/painel" element={<PainelPage/>} />
-                    <Route path= "/evolucao" element={<EvolucaoPage/>} />
+                    <Route path= "/acompanhamento" element={<AcompanhamentoPage/>} />
                 </Route>
             </Route>
             
