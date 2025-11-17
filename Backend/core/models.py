@@ -85,6 +85,7 @@ class Paciente(models.Model):
     id_paciente = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='paciente_perfil') # Liga ao Usuario
     endereco = models.CharField(max_length=200, blank=True)
+    data_nascimento = models.DateField(null=True, blank=True)
     id_comunidade = models.ForeignKey(Comunidade, on_delete=models.SET_NULL, null=True, blank=True, related_name='pacientes')
     criado_em = models.DateTimeField(auto_now_add=True)
 
@@ -111,6 +112,7 @@ class Colaborador(models.Model): # Manter se for um perfil administrativo
 class Voluntario(models.Model):
     id_voluntario = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='voluntario_perfil') # Liga ao Usuario
+    contato = models.CharField(max_length=20, blank=True)
     universidade = models.CharField(max_length=100, blank=True)
     especialidade = models.CharField(max_length=100, blank=True)
 

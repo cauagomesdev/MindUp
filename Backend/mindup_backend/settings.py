@@ -93,6 +93,13 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 50
 }
 
+SIMPLE_JWT = {
+    'USER_ID_FIELD': 'id_usuario', # <-- A CORREÇÃO
+    'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
+
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+}
+
 # Campo padrão para chaves primárias
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'core.Usuario'

@@ -3,7 +3,7 @@
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
-// 1. FUNÇÃO AUXILIAR (Já estava correta)
+// 1. FUNÇÃO AUXILIAR
 async function fetchAPI(endpoint, options = {}) {
   const url = `${API_BASE_URL}${endpoint}`;
   const defaultHeaders = {
@@ -12,7 +12,6 @@ async function fetchAPI(endpoint, options = {}) {
 
   const token = localStorage.getItem('authToken');
   if (token) {
-    // Django espera 'Bearer ' (com espaço) se você usar simple-jwt
     defaultHeaders['Authorization'] = `Bearer ${token}`; 
     }
 
@@ -23,12 +22,17 @@ async function fetchAPI(endpoint, options = {}) {
 
     try {
       const response = await fetch(url, config);
+      
+      // Se a resposta não tiver conteúdo (ex: DELETE), retorne sucesso
+      if (response.status === 204) { 
+        return { success: true, status: response.status, data: null };
+      }
+
       const data = await response.json();
 
       if (!response.ok) {
         return {
         success: false,
-        // O DRF geralmente retorna erros em 'detail' ou nomes de campos
         message: data.detail || data.email || data.password || 'Erro na requisição',
         status: response.status,
       };
@@ -43,20 +47,17 @@ async function fetchAPI(endpoint, options = {}) {
 // === AUTENTICAÇÃO ===
 
 // 2. FUNÇÃO LOGIN (CORRIGIDA)
-// Não "inventa" mais o token. Ela recebe o token e o usuário do backend.
 export async function login(email, password) {
-  const result = await fetchAPI('/auth/login/', { // Endpoint de login do backend
+  const result = await fetchAPI('/auth/login/', {
     method: 'POST',
     body: JSON.stringify({
-      email: email,       // Seu LoginSerializer espera 'email'
-      password: password, // Seu LoginSerializer espera 'password'
+      email: email,
+      password: password, // O LoginSerializer renomeia para 'senha'
     }),
   });
 
   if (result.success) {
     const { data } = result;
-    
-    // O backend (views.py) AGORA retorna 'token' e 'user'
     const token = data.token; 
     const user = data.user;   
 
@@ -73,10 +74,9 @@ export async function login(email, password) {
 }
 
 // 3. FUNÇÃO REGISTER (CORRIGIDA)
-// Agora chama o endpoint unificado /auth/register/
 export async function register(userData) {
-  // 'userData' é o objeto completo do formulário (nome, email, senha, role, etc.)
-  const result = await fetchAPI('/auth/register/', { // Novo endpoint
+  // 'userData' é o objeto completo do formulário (nome, email, password, nivel_acesso, etc.)
+  const result = await fetchAPI('/auth/register/', {
     method: 'POST',
     body: JSON.stringify(userData), // Envia todos os dados de uma vez
   });
@@ -99,19 +99,112 @@ export async function register(userData) {
 export async function logout() {
   localStorage.removeItem('authToken');
   localStorage.removeItem('currentUser');
-  // Se o backend tiver um endpoint de blacklist, chame-o aqui
+  // Se o backend tiver um endpoint de blacklist (ex: /auth/logout/), chame-o aqui
   // await fetchAPI('/auth/logout/', { method: 'POST' }); 
   return { success: true };
 }
 
 
-// === DADOS (Ex: Comunidades) ===
-// Você precisará disso para o Dropdown de Cadastro de Paciente
+// === PACIENTES ===
+export async function getPacientes() {
+  return await fetchAPI('/pacientes/listar', {
+    method: 'GET',
+  });
+}
 
+// === VOLUNTÁRIOS ===
+export async function getVoluntarios() {
+  return await fetchAPI('/voluntarios/', {
+    method: 'GET',
+  });
+}
+
+// === COMUNIDADES ===
 export async function getComunidades() {
    return await fetchAPI('/comunidades/', {
     method: 'GET',
    });
 }
+// (createComunidade removido daqui, pois é uma ação de admin)
 
-// ... (Mantenha as outras funções de API como getAtendimentos, etc.)
+// === ATENDIMENTOS ===
+export async function getAtendimentos() {
+  return await fetchAPI('/atendimentos/', {
+    method: 'GET',
+  });
+}
+
+export async function createAtendimento(atendimentoData) {
+  return await fetchAPI('/atendimentos/', {
+    method: 'POST',
+    body: JSON.stringify(atendimentoData),
+  });
+}
+
+export async function updateAtendimento(id, atendimentoData) {
+  return await fetchAPI(`/atendimentos/${id}/`, {
+    method: 'PATCH',
+    body: JSON.stringify(atendimentoData),
+  });
+}
+
+export async function deleteAtendimento(id) {
+  return await fetchAPI(`/atendimentos/${id}/`, {
+    method: 'DELETE',
+  });
+}
+
+// === ACOMPANHAMENTOS ===
+export async function getAcompanhamentos() {
+  return await fetchAPI('/acompanhamentos/', {
+    method: 'GET',
+  });
+}
+
+export async function createAcompanhamento(acompanhamentoData) {
+  return await fetchAPI('/acompanhamentos/', {
+    method: 'POST',
+    body: JSON.stringify(acompanhamentoData),
+  });
+}
+
+export async function updateAcompanhamento(id, acompanhamentoData) {
+  return await fetchAPI(`/acompanhamentos/${id}/`, {
+    method: 'PATCH',
+    body: JSON.stringify(acompanhamentoData),
+  });
+}
+
+export async function getUsuarios() {
+  return await fetchAPI('/usuarios/', {
+    method: 'GET',
+  });
+}
+
+export async function createUsuario(usuarioData) {
+  return await fetchAPI('/usuarios/', {
+    method: 'POST',
+    body: JSON.stringify(usuarioData),
+  });
+}
+
+// === ESPAÇOS COMUNITÁRIOS ===
+export async function getEspacosComunitarios() {
+  return await fetchAPI('/espacos/', {
+    method: 'GET',
+  });
+}
+
+// === DISPONIBILIDADES ===
+export async function getDisponibilidades() {
+  return await fetchAPI('/disponibilidades/', {
+    method: 'GET',
+  });
+}
+
+export async function createDisponibilidade(disponibilidadeData) {
+  return await fetchAPI('/disponibilidades/', {
+    method: 'POST',
+    body: JSON.stringify(disponibilidadeData),
+  });
+}
