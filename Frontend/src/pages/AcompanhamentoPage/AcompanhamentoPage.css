@@ -1,0 +1,170 @@
+.acompanhamento-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 4rem 4rem 4rem; /* Mais padding embaixo */
+    font-family: Arial, sans-serif;
+    background-color: #fff;
+    min-height: 80vh;
+}
+
+.acompanhamento-header {
+    text-align: left;
+    margin-bottom: 3rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1.5rem;
+}
+
+.acompanhamento-header h1 {
+    font-size: 2.8rem;
+    color: #00796B; /* Cor principal */
+    margin-bottom: 0.5rem;
+}
+
+.acompanhamento-header p {
+    font-size: 1.1rem;
+    color: #555;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* --- Estilos da Linha do Tempo --- */
+
+.timeline {
+    position: relative;
+    padding-left: 2.5rem; /* Espaço para a linha vertical */
+    
+    /* A linha vertical da timeline */
+    border-left: 3px solid #E0F2F1; /* Verde claro */
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 2.5rem;
+}
+
+/* O ponto na linha do tempo */
+.timeline-dot {
+    position: absolute;
+    /* Ajuste para centralizar o ponto na linha */
+    left: -20px; 
+    top: 5px;
+    width: 15px;
+    height: 15px;
+    background-color: #00796B; /* Cor principal */
+    border-radius: 50%;
+    border: 3px solid #fff; /* Fundo branco para destacar */
+    box-shadow: 0 0 0 3px #00796B; /* Anel externo */
+}
+
+.timeline-content {
+    padding-left: 1.5rem;
+    background-color: #F9F9F9; /* Fundo sutil para o card */
+    border-radius: 8px;
+    padding: 1.5rem;
+    border: 1px solid #eee;
+    position: relative;
+}
+
+.timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.timeline-date {
+    font-size: 0.9rem;
+    color: #777;
+    font-weight: bold;
+}
+
+.timeline-status {
+    display: inline-block;
+    background-color: #E0F2F1;
+    color: #004d40;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: capitalize;
+}
+
+.timeline-content h3 {
+    font-size: 1.4rem;
+    color: #333;
+    margin: 0.5rem 0;
+}
+
+.timeline-description {
+    font-size: 1rem;
+    color: #555;
+    line-height: 1.6;
+    margin: 0;
+    white-space: pre-wrap; /* Preserva quebras de linha do texto */
+}
+
+.timeline-item-empty {
+    padding-left: 1.5rem;
+}
+
+.timeline-item-empty h3 {
+    color: #555;
+}
+
+/* Container para loading/erro (opcional) */
+.loading-container {
+    text-align: center;
+    padding: 4rem;
+    font-size: 1.2rem;
+    color: #777;
+}
+
+.error-message {
+    text-align: center;
+    padding: 2rem;
+    color: #d32f2f;
+    font-weight: bold;
+}
+
+/* src/pages/AcompanhamentoPage/AcompanhamentoPage.css */
+
+/* ... (Todo o seu CSS de .acompanhamento-container, .timeline, etc. permanece) ... */
+
+/* --- NOVOS ESTILOS PARA O FORMULÁRIO DO VOLUNTÁRIO --- */
+
+.acompanhamento-container-voluntario {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 4rem 4rem 4rem;
+    font-family: Arial, sans-serif;
+    background-color: #fff;
+    min-height: 80vh;
+}
+
+.acompanhamento-form {
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem; /* Espaço entre os campos */
+}
+
+/* Estiliza o <select> para parecer com os Inputs */
+select.input-field {
+    height: 48px; 
+    padding: 0 10px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2' stroke='%23999'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E%0A");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.2em;
+}
+
+/* Garante que o botão ocupe a largura total */
+.acompanhamento-form .btn.primary {
+    width: 100%;
+}

@@ -44,12 +44,13 @@ function RegisterPage() {
     useEffect(() => {
         async function fetchComunidades() {
             const result = await getComunidades();
-            if (result.success) {
+            if (result.success && Array.isArray(result.data.results)) {
                 // O backend (views.py) retorna {"comunidades": [...]}
-                setComunidadesList(result.data.comunidades);
+                setComunidadesList(result.data.results);
             } else {
                 console.error("Erro ao buscar comunidades:", result.message);
                 setError("Não foi possível carregar a lista de comunidades.");
+                setComunidadesList([]);
             }
         }
         fetchComunidades();
