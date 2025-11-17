@@ -30,7 +30,7 @@ export function AuthProvider({ children }) {
         const result = await apiLogin(email, password);
         if (result.success) {
             setUser(result.user);
-            navigate("/agendamentos"); // Redireciona para a área logada
+            navigate("/painel"); // Redireciona para a área logada
             return result;
         }
         return result;
@@ -43,7 +43,7 @@ export function AuthProvider({ children }) {
         
         if (result.success) {
             setUser(result.user);
-            navigate("/agendamentos"); // Redireciona para a área logada
+            navigate("/painel"); // Redireciona para a área logada
             return result;
         }
         return result;
