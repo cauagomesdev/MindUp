@@ -16,7 +16,8 @@ from .views import (
     ColaboradorListCreate, 
     DisponibilidadeListCreate,
     VagasDisponiveisView,
-    MeusDiasAgendadosView
+    MeusDiasAgendadosView,
+    DashboardVoluntarioView
 )
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -62,5 +63,9 @@ urlpatterns = [
     # Rota para o calendário buscar vagas livres
     path('vagas/', VagasDisponiveisView.as_view(), name='buscar_vagas_disponiveis'),
 
+    # Dias agendados
     path('meus-dias-agendados/', MeusDiasAgendadosView.as_view(), name='meus_dias_agendados'),
+
+    # Dashborad
+    path('dashboard/voluntario/', DashboardVoluntarioView.as_view(), name='dashboard_voluntario'),
 ]
