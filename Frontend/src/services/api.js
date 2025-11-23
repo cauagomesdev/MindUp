@@ -112,11 +112,39 @@ export async function getPacientes() {
   });
 }
 
+export async function getPacienteDetail(id) {
+    return await fetchAPI(`/pacientes/${id}/`, { method: 'GET' }); // Ajuste a rota se for /pacientes/listar
+}
+
+// Atualiza dados do Paciente
+export async function updatePaciente(id, data) {
+    // Nota: Se sua rota de pacientes for apenas lista, você precisará de uma rota de detalhe no backend
+    // Supondo que exista /pacientes/{id}/
+    return await fetchAPI(`/pacientes/${id}/`, {
+        method: 'PATCH',
+        body: JSON.stringify(data)
+    });
+}
+
 // === VOLUNTÁRIOS ===
 export async function getVoluntarios() {
   return await fetchAPI('/voluntarios/', {
     method: 'GET',
   });
+}
+
+export async function getVoluntarioDetail(id) {
+    // Assumindo que você tenha um endpoint /voluntarios/pk/ ou use o filtro
+    // Como sua API é ViewSet, geralmente é /voluntarios/{id}/
+    return await fetchAPI(`/voluntarios/${id}/`, { method: 'GET' });
+}
+
+// Atualiza dados do Voluntário
+export async function updateVoluntario(id, data) {
+    return await fetchAPI(`/voluntarios/${id}/`, {
+        method: 'PATCH', // PATCH atualiza só o que mudou
+        body: JSON.stringify(data)
+    });
 }
 
 // === COMUNIDADES ===
@@ -208,3 +236,4 @@ export async function createDisponibilidade(disponibilidadeData) {
     body: JSON.stringify(disponibilidadeData),
   });
 }
+
