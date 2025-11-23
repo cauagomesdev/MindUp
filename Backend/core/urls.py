@@ -17,7 +17,9 @@ from .views import (
     DisponibilidadeListCreate,
     VagasDisponiveisView,
     MeusDiasAgendadosView,
-    DashboardVoluntarioView
+    DashboardVoluntarioView,
+    PacienteDetail,
+    VoluntarioDetail,
 )
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -68,4 +70,12 @@ urlpatterns = [
 
     # Dashborad
     path('dashboard/voluntario/', DashboardVoluntarioView.as_view(), name='dashboard_voluntario'),
+
+    # Rotas de Pacientes
+    path('pacientes/listar', PacienteList.as_view(), name='listar_pacientes'),
+    path('pacientes/<uuid:id>/', PacienteDetail.as_view(), name='paciente_detail'),
+
+    # Rotas de Voluntários
+    path('voluntarios/', VoluntarioList.as_view(), name='listar_voluntarios'),
+    path('voluntarios/<uuid:id>/', VoluntarioDetail.as_view(), name='voluntario_detail'),
 ]

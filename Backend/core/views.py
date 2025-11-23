@@ -337,3 +337,18 @@ class DashboardVoluntarioView(APIView):
             "proximo_agendamento": proximo_data,
             "pacientes_ativos": total_pacientes
         })
+    
+class PacienteDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Paciente.objects.all()
+    serializer_class = PacienteSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = 'id_paciente' # Nome do campo no banco
+    lookup_url_kwarg = 'id'      # Nome do parâmetro na URL
+
+# View para ler/editar UM voluntário específico
+class VoluntarioDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Voluntario.objects.all()
+    serializer_class = VoluntarioSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = 'id_voluntario'
+    lookup_url_kwarg = 'id'

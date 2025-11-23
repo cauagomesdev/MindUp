@@ -1,0 +1,126 @@
+.perfil-page {
+    background-color: #9CBDB1;
+    min-height: calc(100vh - 80px);
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.perfil-container {
+    background-color: white;
+    width: 100%;
+    max-width: 800px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Cabeçalho com Foto (Avatar) */
+.perfil-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+}
+
+.avatar-circle {
+    width: 100px;
+    height: 100px;
+    background-color: #f0fdf4;
+    border: 3px solid #00695C;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.avatar-icon {
+    width: 50px;
+    height: 50px;
+    stroke: #00695C;
+}
+
+.perfil-name {
+    font-size: 1.8rem;
+    color: #333;
+    margin: 0;
+}
+
+.perfil-role {
+    font-size: 1rem;
+    color: #666;
+    background-color: #e0f2f1;
+    padding: 4px 12px;
+    border-radius: 15px;
+    margin-top: 5px;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+/* Formulário e Grid */
+.perfil-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.info-value {
+    font-size: 1rem;
+    color: #222;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid transparent;
+}
+
+/* Estilo do Input quando está editando */
+.form-group input, .form-group select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: white;
+}
+
+.form-group input:focus {
+    border-color: #00695C;
+    outline: none;
+}
+
+/* Botões de Ação */
+.action-buttons {
+    margin-top: 30px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+/* Responsividade */
+@media (max-width: 600px) {
+    .perfil-form {
+        grid-template-columns: 1fr;
+    }
+}
