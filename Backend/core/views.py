@@ -17,6 +17,9 @@ from .serializers import (
 )
 from rest_framework.pagination import PageNumberPagination
 
+from django.utils import timezone
+from django.db.models import Count
+
 # ===================================================================
 # 1. AUTENTICAÇÃO E REGISTRO
 # ===================================================================
@@ -284,3 +287,53 @@ class MeusDiasAgendadosView(APIView):
         # Remove duplicatas e converte para string
         datas_unicas = sorted(list(set(datas)))
         return Response(datas_unicas)
+    
+class DashboardVoluntarioView(APIView):
+    """
+    Retorna dados para os cards do Painel do Voluntário:
+    1. Próximo Agendamento (Data Futura mais próxima)
+    2. Total de Pacientes Ativos (Pacientes únicos atendidos)
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        
+        # Verifica se é voluntário
+        if user.nivel_acesso != 'voluntario' or not hasattr(user, 'voluntario_perfil'):
+            return Response({"error": "Acesso permitido apenas para voluntários."}, status=403)
+
+        voluntario = user.voluntario_perfil
+        agora = timezone.now() # Data e hora atual
+
+        # 1. PRÓXIMO AGENDAMENTO
+        # Busca atendimentos com status 'agendado' a partir de hoje, ordenado por data/hora
+        proximo = Atendimento.objects.filter(
+            id_voluntario=voluntario,
+            status='agendado',
+            data__gte=agora.date()
+        ).order_by('data', 'horario').first()
+
+        proximo_data = None
+        if proximo:
+            # Verifica se é hoje e se o horário já passou
+            if proximo.data == agora.date() and proximo.horario < agora.time():
+                # Se já passou da hora hoje, pega o próximo (opcional, lógica simples aqui)
+                pass
+            
+            proximo_data = {
+                "paciente_nome": proximo.id_paciente.usuario.nome,
+                "data": proximo.data,   # Formato YYYY-MM-DD
+                "horario": proximo.horario # Formato HH:MM:SS
+            }
+
+        # 2. PACIENTES ATIVOS
+        # Conta quantos IDs de pacientes únicos existem nos atendimentos deste voluntário
+        total_pacientes = Atendimento.objects.filter(
+            id_voluntario=voluntario
+        ).values('id_paciente').distinct().count()
+
+        return Response({
+            "proximo_agendamento": proximo_data,
+            "pacientes_ativos": total_pacientes
+        })

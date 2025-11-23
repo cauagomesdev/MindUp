@@ -12,6 +12,8 @@ import PainelPage from "../pages/PainelPage/PainelPage";
 import SobreNosPage from "../pages/SobreNosPage/SobreNosPage";
 import SuportePage from "../pages/SuportePage/SuportePage";
 import AcompanhamentoPage from "../pages/AcompanhamentoPage/AcompanhamentoPage";
+import PerfilPage from "../pages/PerfilPage/PerfilPage";
+
 
 import ProtectedRoute from "../components/ProtectedRoute/ProtectedRoute";
 
@@ -31,6 +33,7 @@ function AppRoutes() {
 
             <Route element={<ProtectedRoute />}>
                 <Route element={<Layout />}>
+                    <Route path="/perfil" element={<PerfilPage/>} />
                     <Route path="/agendamentos" element={<AgendamentosPage/>} />
                     <Route path= "/painel" element={<PainelPage/>} />
                     <Route path= "/acompanhamento" element={<AcompanhamentoPage/>} />

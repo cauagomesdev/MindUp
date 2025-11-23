@@ -1,0 +1,183 @@
+.painel-page {
+    background-color: #9CBDB1;
+    /* A altura agora desconta o Header (80px) E o Padding (80px totais) */
+    min-height: calc(100vh - 80px); 
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box; /* Garante que o padding fique dentro do tamanho */
+    overflow-x: hidden; /* Evita scroll lateral */
+}
+
+/* Adicione isso para garantir que o body não tenha margem nativa */
+body {
+    margin: 0;
+    overflow-x: hidden;
+}
+
+.painel-container {
+    width: 100%;
+    max-width: 1100px;
+}
+
+/* Cabeçalho do Painel */
+.painel-title {
+    color: white;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 30px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Seção Superior (Banner + Widgets) */
+.top-section {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 80px;
+    flex-wrap: wrap;
+}
+
+/* Card com Imagem (Esquerda) */
+.welcome-card {
+    flex: 1.5;
+    background-color: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    min-width: 300px;
+    height: 350px;
+}
+
+.welcome-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Widgets (Direita) */
+.widgets-area {
+    flex: 1;
+    display: flex;
+    gap: 20px;
+    min-width: 300px;
+}
+
+.widget-card {
+    flex: 1;
+    background-color: white;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 300px;
+}
+
+.widget-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #000;
+    margin-bottom: 15px;
+}
+
+.widget-content {
+    color: #333;
+}
+
+.appointment-info h4 {
+    color: #004d40;
+    margin-bottom: 5px;
+    font-size: 1.1rem;
+}
+
+.big-number {
+    font-size: 4rem;
+    font-weight: bold;
+    color: #000;
+    text-align: center;
+    line-height: 1;
+}
+
+.label-number {
+    text-align: center;
+    display: block;
+    color: #000;
+    font-weight: 500;
+}
+
+/* Seção Inferior (Botões de Ação) */
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    width: 100%;
+}
+
+.action-card {
+    background-color: white;
+    border-radius: 20px;
+    padding: 30px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    text-decoration: none; /* Remove sublinhado do Link */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    border: none;
+    width: 100%;
+    text-align: left;
+}
+
+.action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.icon-box {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Estilo dos Ícones SVG */
+.icon-svg {
+    width: 45px;
+    height: 45px;
+    stroke: #00695C;
+    stroke-width: 2;
+    fill: none;
+}
+
+.card-text h3 {
+    font-size: 1.1rem;
+    color: #000;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.card-text p {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .top-section {
+        flex-direction: column;
+    }
+    
+    .widgets-area {
+        flex-direction: column;
+    }
+    
+    .widget-card, .welcome-card {
+        height: auto;
+        min-height: 200px;
+    }
+}
