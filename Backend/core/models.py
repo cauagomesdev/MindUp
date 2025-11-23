@@ -157,6 +157,7 @@ class Atendimento(models.Model):
     
     id_atendimento = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     data = models.DateField()
+    id_voluntario = models.ForeignKey(Voluntario, on_delete=models.CASCADE, related_name='atendimentos', null=True, blank=True)
     horario = models.TimeField()
     tipo_atendimento = models.CharField(max_length=50, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='agendado')

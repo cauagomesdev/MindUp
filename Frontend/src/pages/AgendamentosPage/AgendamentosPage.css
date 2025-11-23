@@ -1,0 +1,204 @@
+/* Container Principal */
+.agendamento-page {
+    background-color: #9CBDB1;
+    min-height: calc(100vh - 80px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    width: 100%; /* Garante largura total */
+}
+
+.page-title {
+    text-align: center;
+    color: #004d40;
+    margin-bottom: 40px;
+}
+
+/* Flexbox para os cards ficarem lado a lado */
+.cards-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Alinha no topo */
+    gap: 40px;
+    width: 100%;
+    max-width: 1000px;
+    flex-wrap: wrap; /* Permite quebrar linha em mobile */
+}
+
+.card {
+    background-color: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 420px; /* Largura fixa para os cards */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Formulário */
+.form-title {
+    color: #00796b;
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.custom-select-group {
+    margin-bottom: 20px;
+}
+
+.custom-select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: white;
+}
+
+.btn-full {
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* Calendário */
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #000;
+}
+
+.nav-arrow {
+    cursor: pointer;
+    font-size: 1.5rem;
+    user-select: none;
+    padding: 0 10px;
+}
+
+/* O GRID QUE ESTAVA FALTANDO */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7 colunas iguais */
+    gap: 10px;
+    text-align: center;
+}
+
+.day-label {
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #000;
+}
+
+.day-number {
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    padding: 10px 0;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;       /* Centralizar numero */
+    justify-content: center;
+    align-items: center;
+}
+
+.day-number:hover {
+    background-color: #bdbdbd;
+}
+
+.day-number.selected {
+    background-color: #00796b;
+    color: white;
+}
+
+.empty-slot {
+    background: transparent;
+}
+
+.filtros {
+    margin-bottom: 20px;
+}
+
+.placeholder-text {
+    color: #666;
+    font-style: italic;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.lista-vagas {
+    max-height: 400px; /* Scroll se tiver muitos */
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* O Card individual de cada voluntário */
+.vaga-card {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.vaga-card:hover {
+    border-color: #00796B;
+    transform: translateX(2px);
+}
+
+.vaga-info {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.vaga-horario {
+    background-color: #00796B;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.vaga-detalhes {
+    display: flex;
+    flex-direction: column;
+}
+
+.vaga-detalhes strong {
+    color: #334155;
+    font-size: 1rem;
+}
+
+.vaga-detalhes small {
+    color: #64748b;
+    font-size: 0.85rem;
+}
+
+.btn-agendar-mini {
+    background-color: white;
+    border: 1px solid #00796B;
+    color: #00796B;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-agendar-mini:hover {
+    background-color: #00796B;
+    color: white;
+}

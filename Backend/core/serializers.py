@@ -163,12 +163,13 @@ class DisponibilidadeSerializer(serializers.ModelSerializer):
 class AtendimentoSerializer(serializers.ModelSerializer):
     paciente_nome = serializers.CharField(source='id_paciente.usuario.nome', read_only=True)
     espaco_nome = serializers.CharField(source='id_espaco_comunitario.nome', read_only=True)
+    voluntario_nome = serializers.CharField(source='id_voluntario.usuario.nome', read_only=True)
     
     class Meta:
         model = Atendimento
         fields = [
             'id_atendimento', 'data', 'horario', 'tipo_atendimento', 'status', 
-            'id_espaco_comunitario', 'id_paciente', 'paciente_nome', 'espaco_nome', 'criado_em'
+            'id_espaco_comunitario', 'voluntario_nome', 'id_paciente', 'paciente_nome', 'espaco_nome', 'criado_em'
         ]
 
 class AcompanhamentoSerializer(serializers.ModelSerializer):
