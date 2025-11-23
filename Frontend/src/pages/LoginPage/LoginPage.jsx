@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom"; // <--- IMPORT NOVO
 import Input from "../../components/Input/Input";
 import Button from "../../components/Button/Button";
 import "./LoginPage.css";
@@ -37,7 +38,11 @@ function LoginPage() {
             <div className="login-form-section">
 
                 <header className="login-header">
-                    <img src={logoMindUp} alt="MindUp Logo" className="login-logo-img"/>
+                    {/* ALTERAÇÃO AQUI: Link envolvendo a imagem */}
+                    <Link to="/">
+                        <img src={logoMindUp} alt="MindUp Logo" className="login-logo-img"/>
+                    </Link>
+                    
                     <div className="login-brand-text">
                         <h1>MindUp</h1>
                         <p>Seu espaço de Acolhimento</p>
