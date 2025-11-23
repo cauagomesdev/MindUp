@@ -99,13 +99,28 @@ class LoginSerializer(serializers.Serializer):
 
 class UsuarioSerializer(serializers.ModelSerializer):
     """
-    Serializer para *ler* os dados de um Usuário.
-    Usado para retornar o objeto 'user' no login.
+    Serializer para ler dados do Usuário.
+    Agora inclui id_paciente e id_voluntario se existirem.
     """
+    id_paciente = serializers.SerializerMethodField()
+    id_voluntario = serializers.SerializerMethodField()
+
     class Meta:
         model = Usuario
-        fields = ['id_usuario', 'nome', 'email', 'nivel_acesso', 'criado_em']
+        fields = ['id_usuario', 'nome', 'email', 'nivel_acesso', 'criado_em', 'id_paciente', 'id_voluntario']
         read_only_fields = fields
+
+    def get_id_paciente(self, obj):
+        # Verifica se o usuário tem o perfil 'paciente_perfil' (related_name do model)
+        if hasattr(obj, 'paciente_perfil'):
+            return obj.paciente_perfil.id_paciente
+        return None
+
+    def get_id_voluntario(self, obj):
+        # Verifica se o usuário tem o perfil 'voluntario_perfil'
+        if hasattr(obj, 'voluntario_perfil'):
+            return obj.voluntario_perfil.id_voluntario
+        return None
 
 class PacienteSerializer(serializers.ModelSerializer):
     nome = serializers.CharField(source='usuario.nome', read_only=True)

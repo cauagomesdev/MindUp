@@ -202,3 +202,25 @@
     background-color: #00796B;
     color: white;
 }
+
+/* Indicador de dia com agendamento */
+.day-number {
+    position: relative; /* Necessário para posicionar a bolinha */
+}
+
+.day-number.has-appointment::after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    background-color: #e11d48; /* Cor vermelha/rosa destaque */
+    border-radius: 50%;
+}
+
+/* Se o dia estiver selecionado, muda a cor da bolinha para branco */
+.day-number.selected.has-appointment::after {
+    background-color: white;
+}

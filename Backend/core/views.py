@@ -8,7 +8,7 @@ from .models import (
     Disponibilidade, Voluntario, Usuario, Atendimento,
     Participar, Acompanhamento
 )
-from datetime import datetime
+from datetime import datetime,timedelta
 from .serializers import (
     UsuarioRegisterSerializer, LoginSerializer, UsuarioSerializer,
     PacienteSerializer, VoluntarioSerializer, ComunidadeSerializer,
@@ -166,19 +166,24 @@ class UsuarioList(generics.ListAPIView):
     permission_classes = [IsAuthenticated] # Idealmente [IsAdminUser]
     pagination_class = CustomPagination
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from datetime import datetime, timedelta
+from .models import Disponibilidade, Atendimento
+
 class VagasDisponiveisView(APIView):
     """
-    Retorna horários livres para uma data específica,
-    cruzando Disponibilidade do Voluntário vs Atendimentos já marcados.
+    Retorna horários livres fatiados de 1 em 1 hora.
+    Versão corrigida com tratamento para atendimentos antigos (sem voluntário).
     """
     def get(self, request):
-        data_str = request.query_params.get('data') # Ex: '2025-11-25'
+        data_str = request.query_params.get('data') 
         
         if not data_str:
-            return Response({"error": "Data é obrigatória (formato YYYY-MM-DD)"}, status=400)
+            return Response({"error": "Data é obrigatória"}, status=400)
 
         try:
-            # 1. Converte string para data e descobre dia da semana
+            # 1. Converter data
             data_obj = datetime.strptime(data_str, '%Y-%m-%d').date()
             dias_map = {
                 0: 'segunda', 1: 'terca', 2: 'quarta', 3: 'quinta', 
@@ -186,35 +191,96 @@ class VagasDisponiveisView(APIView):
             }
             dia_semana_str = dias_map[data_obj.weekday()]
 
-            # 2. Busca todos voluntários que atendem nesse dia da semana
+            # 2. Buscar disponibilidades
             disponibilidades = Disponibilidade.objects.filter(dia_semana=dia_semana_str)
             
-            # 3. Busca atendimentos JÁ marcados (Agendado ou Realizado) nessa data
-            agendados = Atendimento.objects.filter(
+            # 3. BUSCAR OCUPADOS
+            atendimentos_ocupados = Atendimento.objects.filter(
                 data=data_obj, 
                 status__in=['agendado', 'realizado']
-            ).values_list('horario', 'id_voluntario')
-            
-            # Cria conjunto de tuplas (Horario, ID_Voluntario) ocupadas
-            ocupados_set = {(a[0], a[1]) for a in agendados}
+            )
+
+            ocupados_set = set()
+            for at in atendimentos_ocupados:
+                # --- CORREÇÃO AQUI ---
+                # Verifica se existe um voluntário vinculado. Se for None (antigo), pula.
+                if at.id_voluntario:
+                    hora_str = at.horario.strftime('%H:%M:%S') 
+                    vol_id_str = str(at.id_voluntario.id_voluntario)
+                    chave = f"{hora_str}|{vol_id_str}"
+                    ocupados_set.add(chave)
 
             vagas_livres = []
+            DURACAO_CONSULTA = 1 # horas
 
+            # 4. LOOP DE GERAÇÃO
             for disp in disponibilidades:
-                # Se a combinação (Horario, Voluntario) NÃO estiver ocupada, adiciona à lista
-                if (disp.hora_inicio, disp.id_voluntario.id_voluntario) not in ocupados_set:
-                    vagas_livres.append({
-                        "id_disponibilidade": disp.id_disponibilidade,
-                        "horario": disp.hora_inicio,
-                        "voluntario": {
-                            "id": disp.id_voluntario.id_voluntario,
-                            "nome": disp.id_voluntario.usuario.nome,
-                            "universidade": disp.id_voluntario.universidade,
-                            "especialidade": disp.id_voluntario.especialidade
-                        }
-                    })
+                inicio_dt = datetime.combine(data_obj, disp.hora_inicio)
+                fim_dt = datetime.combine(data_obj, disp.hora_fim)
+                
+                cursor = inicio_dt
+
+                while (cursor + timedelta(hours=DURACAO_CONSULTA)) <= fim_dt:
+                    horario_atual = cursor.time()
+                    
+                    hora_atual_str = horario_atual.strftime('%H:%M:%S')
+                    
+                    # Verifica se id_voluntario existe no objeto de disponibilidade (segurança extra)
+                    if disp.id_voluntario:
+                        vol_atual_id_str = str(disp.id_voluntario.id_voluntario)
+                        chave_atual = f"{hora_atual_str}|{vol_atual_id_str}"
+
+                        # SE NÃO ESTIVER NO SET DE STRINGS, ESTÁ LIVRE
+                        if chave_atual not in ocupados_set:
+                            
+                            vagas_livres.append({
+                                "id_disponibilidade": disp.id_disponibilidade,
+                                "horario": hora_atual_str, 
+                                "voluntario": {
+                                    "id": disp.id_voluntario.id_voluntario,
+                                    "nome": disp.id_voluntario.usuario.nome,
+                                    "universidade": disp.id_voluntario.universidade,
+                                    "especialidade": disp.id_voluntario.especialidade
+                                }
+                            })
+                    
+                    cursor += timedelta(hours=DURACAO_CONSULTA)
+
+            # Ordenar
+            vagas_livres.sort(key=lambda x: x['horario'])
 
             return Response(vagas_livres)
         
         except ValueError:
-            return Response({"error": "Formato de data inválido. Use YYYY-MM-DD"}, status=400)
+            return Response({"error": "Formato de data inválido."}, status=400)
+        
+class MeusDiasAgendadosView(APIView):
+    """
+    Retorna uma lista de datas (YYYY-MM-DD) onde o usuário (Paciente ou Voluntário)
+    possui agendamentos marcados ou realizados.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        datas = []
+
+        if user.nivel_acesso == 'paciente':
+            # Busca datas onde o paciente tem consulta
+            if hasattr(user, 'paciente_perfil'):
+                datas = Atendimento.objects.filter(
+                    id_paciente=user.paciente_perfil,
+                    status__in=['agendado', 'realizado']
+                ).values_list('data', flat=True)
+
+        elif user.nivel_acesso == 'voluntario':
+            # Busca datas onde o voluntário vai atender
+            if hasattr(user, 'voluntario_perfil'):
+                datas = Atendimento.objects.filter(
+                    id_voluntario=user.voluntario_perfil,
+                    status__in=['agendado', 'realizado']
+                ).values_list('data', flat=True)
+        
+        # Remove duplicatas e converte para string
+        datas_unicas = sorted(list(set(datas)))
+        return Response(datas_unicas)
