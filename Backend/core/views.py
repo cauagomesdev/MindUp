@@ -8,6 +8,7 @@ from .models import (
     Disponibilidade, Voluntario, Usuario, Atendimento,
     Participar, Acompanhamento
 )
+from datetime import datetime
 from .serializers import (
     UsuarioRegisterSerializer, LoginSerializer, UsuarioSerializer,
     PacienteSerializer, VoluntarioSerializer, ComunidadeSerializer,
@@ -164,3 +165,56 @@ class UsuarioList(generics.ListAPIView):
     serializer_class = UsuarioSerializer
     permission_classes = [IsAuthenticated] # Idealmente [IsAdminUser]
     pagination_class = CustomPagination
+
+class VagasDisponiveisView(APIView):
+    """
+    Retorna horários livres para uma data específica,
+    cruzando Disponibilidade do Voluntário vs Atendimentos já marcados.
+    """
+    def get(self, request):
+        data_str = request.query_params.get('data') # Ex: '2025-11-25'
+        
+        if not data_str:
+            return Response({"error": "Data é obrigatória (formato YYYY-MM-DD)"}, status=400)
+
+        try:
+            # 1. Converte string para data e descobre dia da semana
+            data_obj = datetime.strptime(data_str, '%Y-%m-%d').date()
+            dias_map = {
+                0: 'segunda', 1: 'terca', 2: 'quarta', 3: 'quinta', 
+                4: 'sexta', 5: 'sabado', 6: 'domingo'
+            }
+            dia_semana_str = dias_map[data_obj.weekday()]
+
+            # 2. Busca todos voluntários que atendem nesse dia da semana
+            disponibilidades = Disponibilidade.objects.filter(dia_semana=dia_semana_str)
+            
+            # 3. Busca atendimentos JÁ marcados (Agendado ou Realizado) nessa data
+            agendados = Atendimento.objects.filter(
+                data=data_obj, 
+                status__in=['agendado', 'realizado']
+            ).values_list('horario', 'id_voluntario')
+            
+            # Cria conjunto de tuplas (Horario, ID_Voluntario) ocupadas
+            ocupados_set = {(a[0], a[1]) for a in agendados}
+
+            vagas_livres = []
+
+            for disp in disponibilidades:
+                # Se a combinação (Horario, Voluntario) NÃO estiver ocupada, adiciona à lista
+                if (disp.hora_inicio, disp.id_voluntario.id_voluntario) not in ocupados_set:
+                    vagas_livres.append({
+                        "id_disponibilidade": disp.id_disponibilidade,
+                        "horario": disp.hora_inicio,
+                        "voluntario": {
+                            "id": disp.id_voluntario.id_voluntario,
+                            "nome": disp.id_voluntario.usuario.nome,
+                            "universidade": disp.id_voluntario.universidade,
+                            "especialidade": disp.id_voluntario.especialidade
+                        }
+                    })
+
+            return Response(vagas_livres)
+        
+        except ValueError:
+            return Response({"error": "Formato de data inválido. Use YYYY-MM-DD"}, status=400)
