@@ -1,0 +1,45 @@
+/* src/pages/RecuperarPage/RecuperarPage.css */
+
+/* REUTILIZA TODA A ESTILIZAÇÃO DO LOGIN */
+@import "../LoginPage/LoginPage.css"; 
+
+/* --- Estilos Específicos da Recuperação --- */
+
+/* Ajuste específico para o texto de instrução ficar bonito no fundo verde */
+.recuperar-description {
+    color: #B2DFDB;
+    text-align: center;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+
+/* Centralizar o link de voltar */
+.back-link {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.back-link a {
+    color: #B2DFDB;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.back-link a:hover {
+    color: white;
+    text-decoration: underline;
+}
+
+/* Feedback message background adjustment if needed inside the green box */
+.feedback-message {
+    background-color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 20px;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #333;
+}
+.feedback-message.success { color: #166534; border: 1px solid #bbf7d0; }
+.feedback-message.error { color: #991b1b; border: 1px solid #fecaca; }
