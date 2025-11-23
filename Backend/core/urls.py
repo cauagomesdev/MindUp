@@ -15,7 +15,8 @@ from .views import (
     AtendimentoDetail,
     ColaboradorListCreate, 
     DisponibilidadeListCreate,
-    VagasDisponiveisView 
+    VagasDisponiveisView,
+    MeusDiasAgendadosView
 )
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -58,7 +59,8 @@ urlpatterns = [
     # Disponibilidades
     path('disponibilidades/', DisponibilidadeListCreate.as_view(), name='listar_criar_disponibilidades'),
 
-    # --- NOVA ROTA AQUI ---
     # Rota para o calendário buscar vagas livres
     path('vagas/', VagasDisponiveisView.as_view(), name='buscar_vagas_disponiveis'),
+
+    path('meus-dias-agendados/', MeusDiasAgendadosView.as_view(), name='meus_dias_agendados'),
 ]
