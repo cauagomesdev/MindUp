@@ -9,6 +9,8 @@
 
 MindUp é uma plataforma web desenvolvida para facilitar o gerenciamento de atendimentos e acompanhamentos em saúde mental em comunidades. O sistema permite que pacientes agendem consultas, profissionais registrem evoluções e administradores gerenciem todo o processo.
 
+link do video do youtube: https://youtu.be/pcCy0_kDR90
+
 ## ✨ Funcionalidades
 
 ### Para Pacientes 👤
