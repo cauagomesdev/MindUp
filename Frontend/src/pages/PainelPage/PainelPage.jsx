@@ -124,7 +124,7 @@ const PainelPage = () => {
 
                 {/* BOTÕES DE AÇÃO (MANTIDO IGUAL) */}
                 <div className="actions-grid">
-                    <Link to="/agendamento" className="action-card">
+                    <Link to="/agendamentos" className="action-card">
                         <div className="icon-box">
                            <svg className="icon-svg" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
                                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -139,7 +139,7 @@ const PainelPage = () => {
                         </div>
                     </Link>
 
-                    <Link to="/acompanhamentos" className="action-card">
+                    <Link to="/acompanhamento" className="action-card">
                         <div className="icon-box">
                             <svg className="icon-svg" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
                                 <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
