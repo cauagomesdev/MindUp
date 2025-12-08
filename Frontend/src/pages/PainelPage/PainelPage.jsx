@@ -124,7 +124,7 @@ const PainelPage = () => {
 
                 {/* BOTÕES DE AÇÃO (MANTIDO IGUAL) */}
                 <div className="actions-grid">
-                    <Link to="/agendamentos" className="action-card">
+                    <Link to="/agendamento" className="action-card">
                         <div className="icon-box">
                            <svg className="icon-svg" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
                                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
